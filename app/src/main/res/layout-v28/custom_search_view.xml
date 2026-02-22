@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:background="@drawable/dialog_border"
+    android:orientation="vertical"
+    app:cardCornerRadius="25dp">
+
+
+    <!-- Заголовок и поисковая строка -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            android:padding="8dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnCancelSearch"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_weight="0"
+                app:cardCornerRadius="25dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:layout_width="18dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/icon_back">
+
+
+                    </TextView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <EditText
+                android:id="@+id/searchEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Введите название или теги..."
+                android:imeOptions="actionSearch"
+                android:maxLines="1"
+                android:padding="8dp"
+                android:textSize="18sp" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <!-- Результаты поиска -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="4dp" />
+    <!-- Нижняя панель -->
+
+
+</LinearLayout>
+
+

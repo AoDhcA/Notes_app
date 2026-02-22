@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="26dp"
+    android:backgroundTint="@color/blue">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/captionEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:hint="Заголовок таблицы"
+                android:layout_weight="1"
+                android:importantForAutofill="no" />
+
+            <TextView
+                android:id="@+id/editTableButton"
+                android:layout_width="22dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/icon_edit_table">
+
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/deleteTableButton"
+                android:layout_width="22dp"
+                android:layout_height="20dp"
+                android:layout_marginHorizontal="10dp"
+                android:background="@drawable/icon_delete" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:scrollbars="horizontal">
+
+            <TableLayout
+                android:id="@+id/tableLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

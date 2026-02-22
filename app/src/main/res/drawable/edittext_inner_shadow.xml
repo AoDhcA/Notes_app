@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Основной фон -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/blue" />
+            <!-- Внутренние отступы для текста -->
+        </shape>
+    </item>
+
+    <!-- Внутренняя тень - прямоугольная сверху -->
+    <!-- Эмулируем blur=4 через градиент -->
+    <item
+        android:height="8dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="-90"
+                android:startColor="#c7cccc"
+                android:endColor="@color/blue" />
+        </shape>
+    </item>
+
+</layer-list>

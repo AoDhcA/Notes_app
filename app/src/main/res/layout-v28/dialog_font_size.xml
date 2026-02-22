@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/dialog_border"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnFontSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A"
+        android:textSize="12sp"
+        android:layout_margin="8dp" />
+
+    <Button
+        android:id="@+id/btnFontMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A"
+        android:textSize="16sp"
+        android:layout_margin="8dp" />
+
+    <Button
+        android:id="@+id/btnFontLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="A"
+        android:textSize="20sp"
+        android:layout_margin="8dp" />
+
+    <Button
+        android:id="@+id/btnFontCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="X"
+        android:layout_margin="8dp" />
+
+</LinearLayout>

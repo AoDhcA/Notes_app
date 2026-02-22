@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue">
+
+    <LinearLayout
+        android:id="@+id/mainContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue"
+        android:orientation="vertical">
+
+        <!-- Верхняя панель с кнопками -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Кнопка назад -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/button_back"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="9dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/buttonText"
+                        android:layout_width="18dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/icon_back" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/textSizeCardView"
+                android:layout_width="132dp"
+                android:layout_height="45dp"
+                android:layout_gravity="top"
+                android:layout_marginStart="10dp"
+                android:clickable="true"
+                android:visibility="invisible"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="9dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/decreaseTextSizeTV"
+                        android:layout_width="40dp"
+                        android:layout_height="45dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="-"
+                        android:textColor="@color/black"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:id="@+id/CurrentTextSizeTV"
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="16"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/increaseTextSizeTV"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="+"
+                        android:textColor="@color/black"
+                        android:textSize="30sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/list_button"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="top"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="9dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/list_button_text"
+                        android:layout_width="18dp"
+                        android:layout_height="10dp"
+                        android:background="@drawable/icon_list" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/text_size_button"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="top"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="9dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/text_size_text"
+                        android:layout_width="21dp"
+                        android:layout_height="20dp"
+                        android:background="@drawable/icon_text_color" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnAddTable"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="top"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="9dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/table_button_text"
+                        android:layout_width="20dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/icon_table" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="114dp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            android:padding="16dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/titleEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:hint="Введите название документа"
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapSentences|textAutoCorrect"
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black67"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.example.notes.TagEditText
+                        android:id="@+id/tagEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:hint="Введите теги"
+                        android:textColorHint="@color/black67"
+                        android:imeOptions="actionDone"
+                        android:inputType="text|textMultiLine"
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </ScrollView>
+
+
+            </LinearLayout>
+            <!-- Заголовок документа в центре -->
+
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Область редактирования заметки -->
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:id="@+id/blocksContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="8dp" />
+
+        </ScrollView>
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tableEditDialog"
+        android:layout_width="match_parent"
+        android:layout_height="114dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="76dp"
+        android:layout_marginHorizontal="16dp"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Столбцы:"
+                    android:gravity="center|end"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- ДОБАВЛЯЕМ ID -->
+                <EditText
+                    android:id="@+id/editColumns"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cancel_button"
+                    android:layout_width="130dp"
+                    android:layout_height="45dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="@color/red"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/cancel_button_icon"
+                            android:layout_width="21dp"
+                            android:layout_height="20dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:background="@drawable/icon_cancel" />
+
+                        <TextView
+                            android:id="@+id/cancel_button_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:text="Отменить"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center|end"
+                    android:text="Строки:"
+                    android:textAlignment="textEnd"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <!-- ДОБАВЛЯЕМ ID -->
+                <EditText
+                    android:id="@+id/editRows"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
+                    android:layout_weight="1"
+                    android:textSize="18sp" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/okay_button"
+                    android:layout_width="130dp"
+                    android:layout_height="45dp"
+                    android:layout_marginVertical="8dp"
+                    android:layout_marginHorizontal="16dp"
+                    app:cardBackgroundColor="@color/green"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/okay_button_icon"
+                            android:layout_width="21dp"
+                            android:layout_height="20dp"
+                            android:layout_marginHorizontal="10dp"
+                            android:background="@drawable/icon_okey" />
+
+                        <TextView
+                            android:id="@+id/okay_button_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:text="Принять"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
