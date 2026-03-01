@@ -4,34 +4,34 @@
 
 ## Features
 
-- ✏️ **Block Editor**:
-  - **Text blocks** — support formatting: changing text size (via HTML tags), creating numbered and bulleted lists.
-  - **Table blocks** — insert tables directly into text; when inserting, the text after the cursor is automatically moved to a new block, and when deleting, it correctly merges with the adjacent block.
-- 🏷️ **Flexible Tag System**:
-  - Each note can be assigned multiple tags.
-  - Two types of tag search:
+* ✏️ **Block Editor**:
+  * **Text blocks** — support formatting: changing text size (via HTML tags), creating numbered and bulleted lists.
+  * **Table blocks** — insert tables directly into text; when inserting, the text after the cursor is automatically moved to a new block, and when deleting, it correctly merges with the adjacent block.
+* 🏷️ **Flexible Tag System**:
+  * Each note can be assigned multiple tags.
+  * Two types of tag search:
     1. **Search bar** — enter tags separated by commas; searches simultaneously by file name and tags.
     2. **Single-tag filter** — select a tag from the list, display all notes with that tag.
-- 📄 **DOCX Export**:
-  - Notes are saved in `.docx` format using the **Apache POI** library.
-  - Export preserves the full block structure and formatting.
-- 💾 **Local Storage**:
-  - Metadata (tags, relationships) stored in **SQLite**.
-  - Note files saved in the app's internal storage.
-- 📱 **Minimum Android Version** — 8.0 (API level 26).
+* 📄 **DOCX Export**:
+  * Notes are saved in `.docx` format using the **Apache POI** library.
+  * Export preserves the full block structure and formatting.
+* 💾 **Local Storage**:
+  * Metadata (tags, relationships) stored in **SQLite**.
+  * Note files saved in the app's internal storage.
+* 📱 **Minimum Android Version** — 8.0 (API level 26).
 
 ## Technologies & Libraries
 
-- **Language**: Java
-- **IDE**: Android Studio
-- **Document format**: Apache POI (for .docx manipulation)
-- **Database**: SQLite (built-in)
-- **UI**: standard Android widgets (EditText, RecyclerView, etc.)
+* **Language**: Java
+* **IDE**: Android Studio
+* **Document format**: Apache POI (for .docx manipulation)
+* **Database**: SQLite (built-in)
+* **UI**: standard Android widgets (EditText, RecyclerView, etc.)
 
 ## Requirements
 
-- Device running Android 8.0 (Oreo) or higher.
-- To build from source: Android Studio 4.0+.
+* Device running Android 8.0 (Oreo) or higher.
+* To build from source: Android Studio 4.0+.
 
 ## Installation & Build
 
