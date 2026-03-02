@@ -37,7 +37,7 @@
 
 1. Clone the repository:
  
-    git clone https://github.com/yourusername/NotesApp.git
+    git clone https://github.com/AoDhcA/NotesApp.git
 
 2. Open the project in Android Studio:
 
@@ -107,13 +107,33 @@
     └── README.md                                   # This file
 
 ## Screenshots
-(Add screenshots of the main screen, editor, and search dialog here so users can immediately see the interface.)
+
+<div align="center">
+  <img src="screenshots/main_screen.png" alt="Home screen" width="250"/>
+  <p align="center">Home screen</p>
+  <img src="screenshots/editorscreen.png" alt="Editor screen" width="250"/>
+  <p align="center">Editor screen</p>
+  <img src="screenshots/changeTextSize.png" alt="Changing text size" width="250"/> 
+  <p align="center">Changing text size</p>
+  <img src="screenshots/listMenu.png" alt="Insert numbered and bulleted lists dialog" width="250"/>
+  <p align="center">Insert numbered and bulleted lists dialog</p>
+  <img src="screenshots/tableMenu.png" alt="Insert Table Dialog" width="250"/>
+  <p align="center">Insert Table Dialog</p>
+  <img src="screenshots/tableInsInText.png" alt="Table inserted into the text" width="250"/>
+  <p align="center">Result</p>
+  <img src="screenshots/sortByTags.png" alt="Sort by tags" width="250"/>
+  <p align="center">Sort by tags</p>
+  <img src="screenshots/searchByTagsAnames.png" alt="Search by tags and title" width="250"/>
+  <p align="center">Search by tags and title</p>
+</div>
 
 ## Roadmap
 
+* Clean up the code.
+
 * Image support in blocks.
 
-* Themes.
+* Themes and languages.
 
 ## License
 
@@ -125,4 +145,4 @@ This project is distributed under the Apache 2.0 License. ee the [LICENSE](LICEN
 
 GitHub: [@AoDhcA](https://github.com/AoDhcA) 
 
-Email:
+Report issues: [Issues](https://github.com/AoDhcA/NotesApp/issues)
