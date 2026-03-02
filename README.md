@@ -137,7 +137,7 @@
 
 ## License
 
-This project is distributed under the Apache 2.0 License. ee the [LICENSE](LICENSE) file for details.
+This project is distributed under the Apache 2.0 License. ee the [LICENSE](LICENSE.md) file for details.
 
 ## Author
 
