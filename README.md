@@ -145,4 +145,4 @@ This project is distributed under the Apache 2.0 License. ee the [LICENSE](LICEN
 
 GitHub: [@AoDhcA](https://github.com/AoDhcA) 
 
-Report issues: [Issues](https://github.com/AoDhcA/NotesApp/issues)
+Report issues: [Issues](https://github.com/AoDhcA/Notes_app/issues)
