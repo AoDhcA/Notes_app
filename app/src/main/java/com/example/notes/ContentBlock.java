@@ -11,7 +11,7 @@ public abstract class ContentBlock {
     protected BlockType type;
 
     public enum BlockType {
-        TEXT, TABLE, //IMAGE, HEADER
+        TEXT, TABLE,
     }
 
     public ContentBlock() {

@@ -26,7 +26,7 @@ public class DocxBlockExporter {
 
                 switch (block.getType()) {
                     case TEXT:
-                        // СОХРАНЯЕМ ДАЖЕ ПУСТЫЕ ТЕКСТОВЫЕ БЛОКИ
+                        // сохраниение всех блоков
                         addTextBlockToDocument(document, (TextBlock) block);
                         break;
                     case TABLE:
@@ -67,48 +67,6 @@ public class DocxBlockExporter {
         }
     }
 
-    //    private static void exportFormattedText(XWPFParagraph paragraph, String htmlContent) {
-//        Log.d("ExportDebug", "Экспорт HTML: " + htmlContent);
-//        try {
-//            // Декодируем HTML-сущности
-//            String decodedHtml = htmlContent
-//                    .replace("&lt;", "<")
-//                    .replace("&gt;", ">")
-//                    .replace("&amp;", "&")
-//                    .replace("&quot;", "\"")
-//                    .replace("&#39;", "'");
-//
-//            // Теперь обрабатываем <br> как переносы строк
-//            String[] lines = decodedHtml.split("<br>");
-//
-//            for (int i = 0; i < lines.length; i++) {
-//                String line = lines[i];
-//                if (!line.trim().isEmpty()) {
-//                    // Парсим форматирование для каждой строки
-//                    List<TextSegment> segments = parseHtmlSegments(line);
-//
-//                    for (TextSegment segment : segments) {
-//                        XWPFRun run = paragraph.createRun();
-//                        run.setText(segment.text);
-//
-//                        if (segment.fontSize != -1) {
-//                            run.setFontSize(segment.fontSize * 2);
-//                        }
-//                    }
-//
-//                    // Добавляем перенос строки, если это не последняя строка
-//                    if (i < lines.length - 1) {
-//                        paragraph.createRun().addBreak();
-//                    }
-//                }
-//            }
-//
-//        } catch (Exception e) {
-//            Log.e("ExportFormat", "Ошибка экспорта форматированного текста", e);
-//            XWPFRun run = paragraph.createRun();
-//            run.setText(Html.fromHtml(htmlContent).toString());
-//        }
-//    }
     private static void exportFormattedText(XWPFParagraph paragraph, String htmlContent) {
         Log.d("ExportDebug", "Экспорт HTML: " + htmlContent);
         try {
@@ -225,136 +183,91 @@ public class DocxBlockExporter {
         return segments;
     }
 
-    private static void processTextWithoutFont(String text, List<TextSegment> segments) {
-        if (text == null || text.isEmpty()) return;
+//    private static void processTextWithoutFont(String text, List<TextSegment> segments) {
+//        if (text == null || text.isEmpty()) return;
+//
+//        String[] parts = text.split("<br>");
+//
+//        for (int i = 0; i < parts.length; i++) {
+//            if (!parts[i].isEmpty()) {
+//                String decoded = decodeHtmlEntities(parts[i]);
+//                segments.add(new TextSegment(decoded, -1));
+//            }
+//
+//            if (i < parts.length - 1) {
+//                segments.add(new TextSegment("", -1, true));
+//            }
+//        }
+//    }
 
-        String[] parts = text.split("<br>");
+//    private static void processFontContent(String content, int fontSize, List<TextSegment> segments) {
+//        // Разделяем по <br> внутри тега <font>
+//        String[] parts = content.split("<br>");
+//
+//        for (int i = 0; i < parts.length; i++) {
+//            if (!parts[i].isEmpty()) {
+//                // Декодируем HTML-сущности
+//                String text = decodeHtmlEntities(parts[i]);
+//                segments.add(new TextSegment(text, fontSize));
+//            }
+//
+//            // Добавляем перенос строки после каждой части, кроме последней
+//            if (i < parts.length - 1) {
+//                segments.add(new TextSegment("", -1, true)); // isLineBreak = true
+//            }
+//        }
+//    }
 
-        for (int i = 0; i < parts.length; i++) {
-            if (!parts[i].isEmpty()) {
-                String decoded = decodeHtmlEntities(parts[i]);
-                segments.add(new TextSegment(decoded, -1));
-            }
-
-            if (i < parts.length - 1) {
-                segments.add(new TextSegment("", -1, true));
-            }
-        }
-    }
-
-    private static void processFontContent(String content, int fontSize, List<TextSegment> segments) {
-        // Разделяем по <br> внутри тега <font>
-        String[] parts = content.split("<br>");
-
-        for (int i = 0; i < parts.length; i++) {
-            if (!parts[i].isEmpty()) {
-                // Декодируем HTML-сущности
-                String text = decodeHtmlEntities(parts[i]);
-                segments.add(new TextSegment(text, fontSize));
-            }
-
-            // Добавляем перенос строки после каждой части, кроме последней
-            if (i < parts.length - 1) {
-                segments.add(new TextSegment("", -1, true)); // isLineBreak = true
-            }
-        }
-    }
-
-//    private static List<TextSegment> parseFontSegments(String html) {
+//    private static List<TextSegment> parseHtmlSegments(String html) {
 //        List<TextSegment> segments = new ArrayList<>();
+//
+//        if (html == null || html.isEmpty()) {
+//            return segments;
+//        }
+//
+//        Log.d("ExportDebug", "Парсинг HTML: " + html);
+//
 //        Pattern pattern = Pattern.compile("(<font size=\"(\\d+)\">(.*?)</font>)|([^<]+)");
 //        Matcher matcher = pattern.matcher(html);
+//
+//        int lastPosition = 0;
 //
 //        while (matcher.find()) {
 //            if (matcher.group(1) != null) {
 //                int fontSize = Integer.parseInt(matcher.group(2));
 //                String content = matcher.group(3);
-//                String plainContent = Html.fromHtml(content).toString();
+//
+//                // Декодируем HTML-сущности в содержимом тега
+//                String plainContent = decodeHtmlEntities(content);
+//
 //                if (!plainContent.isEmpty()) {
 //                    segments.add(new TextSegment(plainContent, fontSize));
+//                    Log.d("ExportDebug", "Добавлен текст в теге: '" + plainContent + "' с размером " + fontSize);
 //                }
 //            } else if (matcher.group(4) != null) {
 //                String content = matcher.group(4);
-//                String plainContent = Html.fromHtml(content).toString();
+//                String plainContent = decodeHtmlEntities(content);
+//
 //                if (!plainContent.trim().isEmpty()) {
 //                    segments.add(new TextSegment(plainContent, -1));
+//                    Log.d("ExportDebug", "Добавлен текст вне тега: '" + plainContent + "'");
 //                }
+//            }
+//
+//            lastPosition = matcher.end();
+//        }
+//
+//        if (lastPosition < html.length()) {
+//            String remaining = html.substring(lastPosition);
+//            String plainRemaining = decodeHtmlEntities(remaining);
+//            if (!plainRemaining.trim().isEmpty()) {
+//                segments.add(new TextSegment(plainRemaining, -1));
+//                Log.d("ExportDebug", "Добавлен оставшийся текст: '" + plainRemaining + "'");
 //            }
 //        }
 //
+//        Log.d("ExportDebug", "Всего сегментов: " + segments.size());
 //        return segments;
-//    }
-
-    private static List<TextSegment> parseHtmlSegments(String html) {
-        List<TextSegment> segments = new ArrayList<>();
-
-        if (html == null || html.isEmpty()) {
-            return segments;
-        }
-
-        Log.d("ExportDebug", "Парсинг HTML: " + html);
-
-        Pattern pattern = Pattern.compile("(<font size=\"(\\d+)\">(.*?)</font>)|([^<]+)");
-        Matcher matcher = pattern.matcher(html);
-
-        int lastPosition = 0;
-
-        while (matcher.find()) {
-            if (matcher.group(1) != null) {
-                int fontSize = Integer.parseInt(matcher.group(2));
-                String content = matcher.group(3);
-
-                // Декодируем HTML-сущности в содержимом тега
-                String plainContent = decodeHtmlEntities(content);
-
-                if (!plainContent.isEmpty()) {
-                    segments.add(new TextSegment(plainContent, fontSize));
-                    Log.d("ExportDebug", "Добавлен текст в теге: '" + plainContent + "' с размером " + fontSize);
-                }
-            } else if (matcher.group(4) != null) {
-                String content = matcher.group(4);
-                String plainContent = decodeHtmlEntities(content);
-
-                if (!plainContent.trim().isEmpty()) {
-                    segments.add(new TextSegment(plainContent, -1));
-                    Log.d("ExportDebug", "Добавлен текст вне тега: '" + plainContent + "'");
-                }
-            }
-
-            lastPosition = matcher.end();
-        }
-
-        if (lastPosition < html.length()) {
-            String remaining = html.substring(lastPosition);
-            String plainRemaining = decodeHtmlEntities(remaining);
-            if (!plainRemaining.trim().isEmpty()) {
-                segments.add(new TextSegment(plainRemaining, -1));
-                Log.d("ExportDebug", "Добавлен оставшийся текст: '" + plainRemaining + "'");
-            }
-        }
-
-        Log.d("ExportDebug", "Всего сегментов: " + segments.size());
-        return segments;
-    }
-
-//    private static String decodeHtmlEntities(String text) {
-//        if (text == null) return "";
-//
-//        return text.replace("&lt;", "<")
-//                .replace("&gt;", ">")
-//                .replace("&amp;", "&")
-//                .replace("&quot;", "\"")
-//                .replace("&#39;", "'")
-//                .replace("<br>", "\n");
-//    }
-//    private static String decodeHtmlEntities(String text) {
-//        if (text == null) return "";
-//
-//        return text.replace("&lt;", "<")
-//                .replace("&gt;", ">")
-//                .replace("&amp;", "&")
-//                .replace("&quot;", "\"")
-//                .replace("&#39;", "'");
 //    }
 
     private static String decodeHtmlEntities(String text) {
@@ -392,15 +305,6 @@ public class DocxBlockExporter {
         }
     }
 
-    //    private static class TextSegment {
-//        String text;
-//        int fontSize; // -1 для текста без форматирования
-//
-//        TextSegment(String text, int fontSize) {
-//            this.text = text;
-//            this.fontSize = fontSize;
-//        }
-//    }
     private static class TextSegment {
         String text;
         int fontSize; // -1 для текста без форматирования

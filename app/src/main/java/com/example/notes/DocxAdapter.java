@@ -60,9 +60,7 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
         setupEventHandlers(holder, file);
     }
 
-    /**
-     * Обрезает имя файла для отображения (убирает .docx и ограничивает длину)
-     */
+    //  Обрезает имя файла для отображения (убирает .docx и ограничивает длину)
     private String truncateFileName(String fileName, int maxLength) {
         if (fileName == null || fileName.isEmpty()) return "Новый документ";
 
@@ -159,9 +157,6 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
     }
 
     @Override
-//    public int getItemCount() {
-//        return fileList.size();
-//    }
     public int getItemCount() {
         return fileList != null ? fileList.size() : 0;
     }
@@ -169,14 +164,14 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
     public void updateList(List<DocxFile> newList) {
         // Всегда создаем новый список чтобы избежать проблем с ссылками
         this.fileList = new ArrayList<>(newList);
-        notifyDataSetChanged(); // Самый безопасный метод
-    }
-
-    public void clearAndUpdateList(List<DocxFile> newList) {
-        fileList.clear();
-        fileList.addAll(newList);
         notifyDataSetChanged();
     }
+
+//    public void clearAndUpdateList(List<DocxFile> newList) {
+//        fileList.clear();
+//        fileList.addAll(newList);
+//        notifyDataSetChanged();
+//    }
     public interface OnItemClickListener {
         void onItemClick(DocxFile file);
 

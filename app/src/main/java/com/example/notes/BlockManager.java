@@ -26,17 +26,17 @@ public class BlockManager {
     private BlockFocusListener focusListener;
     private boolean isRendering = false;
 
-    // ДОБАВЛЯЕМ: интерфейс для уведомления об изменениях
+    // Интерфейс для уведомления об изменениях
     public interface OnContentChangeListener {
         void onContentChanged();
     }
 
-    // ДОБАВЛЯЕМ: метод для установки слушателя фокуса
+    // Метод для установки слушателя фокуса
     public void setBlockFocusListener(BlockFocusListener listener) {
         this.focusListener = listener;
     }
 
-    // ДОБАВИТЬ: класс для хранения состояния блока
+    // Класс для хранения состояния блока
     private static class BlockState {
         String htmlContent;
         int selectionStart;
@@ -58,7 +58,7 @@ public class BlockManager {
         this.contentChangeListener = listener;
     }
 
-    // метод для сохранения состояния ВСЕХ блоков перед операциями
+    // Метод для сохранения состояния блоков перед операциями
     public void saveAllBlockStates() {
         blockStates.clear();
 
@@ -78,8 +78,7 @@ public class BlockManager {
                 int selectionEnd = editText.getSelectionEnd();
                 boolean hasFocus = editText.hasFocus();
 
-                // НЕ сохраняем состояние, если блок был только что изменен
-                // Проверяем, не изменился ли HTML (если null, значит обычный текст)
+                // Если null, значит обычный текст
                 if (shouldSaveBlockState(textBlock)) {
                     blockStates.put(block.getId(), new BlockState(htmlContent, selectionStart, selectionEnd, hasFocus));
                     Log.d("BlockManager", "Сохранено состояние блока " + block.getId() +
@@ -96,13 +95,10 @@ public class BlockManager {
         if (textBlock.getHtmlContent() == null) {
             return true;
         }
-
-        // Логика для определения, нужно ли сохранять состояние
-        // Например, можно добавить флаг в TextBlock, указывающий, что он был изменен
         return true;
     }
 
-    // ДОБАВИТЬ: метод для восстановления состояния ВСЕХ блоков после операций
+    // Метод для восстановления состояния ВСЕХ блоков после операций
     public void restoreAllBlockStates() {
         Log.d("BlockManager", "=== ВОССТАНОВЛЕНИЕ СОСТОЯНИЙ БЛОКОВ ===");
         for (int i = 0; i < Math.min(container.getChildCount(), blocks.size()); i++) {
@@ -149,7 +145,7 @@ public class BlockManager {
         Log.d("BlockManager", "=== ВОССТАНОВЛЕНИЕ ЗАВЕРШЕНО ===");
     }
 
-    // ДОБАВЛЯЕМ: отслеживание текущих View
+    // Отслеживание текущих View
     private List<View> currentViews = new ArrayList<>();
 
     public BlockManager(LinearLayout container, Context context) {
@@ -158,13 +154,13 @@ public class BlockManager {
     }
 
     public void addBlock(ContentBlock block) {
-        // ОБНОВЛЯЕМ ДАННЫЕ ИЗ ТЕКУЩИХ VIEW ПЕРЕД ДОБАВЛЕНИЕМ
+        // обновление данных текущих view перед обновлением
         updateAllBlocksFromViews();
 
         blocks.add(block);
         renderBlocks();
 
-        // УБЕДИТЕСЬ, что форматирование сохранилось
+        // проверка что форматирование сохранилось
         if (block instanceof TextBlock) {
             TextBlock textBlock = (TextBlock) block;
             Log.d("BlockManager", "Добавлен TextBlock с HTML: " + textBlock.getHtmlContent());
@@ -172,7 +168,7 @@ public class BlockManager {
     }
 
     public void insertBlock(int position, ContentBlock block) {
-        // ОБНОВЛЯЕМ ДАННЫЕ ИЗ ТЕКУЩИХ VIEW
+        // обновление данных текущих view
         updateAllBlocksFromViews();
 
         blocks.add(position, block);
@@ -180,10 +176,10 @@ public class BlockManager {
     }
 
     public void removeBlock(String blockId) {
-        // ОБНОВЛЯЕМ ДАННЫЕ ИЗ ТЕКУЩИХ VIEW
+        // обновление данных текущих view
         updateAllBlocksFromViews();
 
-        // НАХОДИМ ИНДЕКС БЛОКА
+        // поиск индекса блока
         int indexToRemove = -1;
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).getId().equals(blockId)) {
@@ -194,11 +190,12 @@ public class BlockManager {
 
         if (indexToRemove != -1) {
             blocks.remove(indexToRemove);
-            renderBlocks(); // ПЕРЕРИСОВЫВАЕМ ВСЕ БЛОКИ
+            renderBlocks();
             Log.d("BlockManager", "Блок удален: " + blockId + ", индекс: " + indexToRemove);
         }
     }
 
+    // перерисовывает все блоки
     public void renderBlocks() {
         Log.d("BlockManager", "renderBlocks: начало, блоков=" + blocks.size());
         Log.d("BlockManager", "=== НАЧАЛО RENDER BLOCKS ===");
@@ -218,7 +215,7 @@ public class BlockManager {
         isRendering = true;
 
         try {
-            // СОХРАНЯЕМ форматирование перед перерисовкой
+            // сохраниение форматирования перед  перерисовкой
             saveCurrentFormatting();
 
             container.removeAllViews();
@@ -240,7 +237,7 @@ public class BlockManager {
                 container.addView(blockView);
                 currentViews.add(blockView);
 
-                // ВОССТАНАВЛИВАЕМ форматирование после добавления в контейнер
+                // Восстанавливает форматирование поле добавление в контейнер
                 restoreFormatting(block, blockView);
 
                 // Настройка фокуса и слушателей
@@ -255,7 +252,7 @@ public class BlockManager {
 
             Log.d("BlockManager", "renderBlocks: завершено");
 
-            // Проверим результат
+            // Проверка результата
             for (ContentBlock block : blocks) {
                 if (block instanceof TextBlock) {
                     TextBlock textBlock = (TextBlock) block;
@@ -269,7 +266,7 @@ public class BlockManager {
         Log.d("BlockManager", "=== КОНЕЦ RENDER BLOCKS ===");
     }
 
-    // ДОБАВЛЯЕМ: сохранение текущего форматирования
+    // Сохранение текущего форматирования
     private void saveCurrentFormatting() {
         Log.d("BlockManager", "saveCurrentFormatting: сохранение форматирования");
         for (int i = 0; i < Math.min(container.getChildCount(), blocks.size()); i++) {
@@ -280,14 +277,14 @@ public class BlockManager {
                 TextBlock textBlock = (TextBlock) block;
                 EditText editText = (EditText) blockView;
 
-                // Пропускаем блоки, помеченные как измененные
+                // Пропуск блоков, помеченныех как измененные
                 if (textBlock.wasModified()) {
                     Log.d("BlockManager", "Пропущено сохранение для измененного блока " + textBlock.getId());
-                    textBlock.clearModifiedFlag(); // Сбрасываем флаг после рендера
+                    textBlock.clearModifiedFlag(); // Сброс флага после рендера
                     continue;
                 }
 
-                // Сохраняем Spannable в HTML перед удалением View
+                // Сохранение Spannable в HTML перед удалением View
                 if (editText.getText() instanceof Spannable) {
                     Spannable spannable = (Spannable) editText.getText();
                     textBlock.updateHtmlFromSpannable(spannable);
@@ -305,7 +302,7 @@ public class BlockManager {
         }
         isRendering = true;
         try {
-            // Сохраняем форматирование перед перерисовкой
+            // Сохранение форматирования перед перерисовкой
             saveCurrentFormatting();
 
             container.removeAllViews();
@@ -326,7 +323,7 @@ public class BlockManager {
                 container.addView(blockView);
                 currentViews.add(blockView);
 
-                // Восстанавливаем форматирование после добавления в контейнер
+                // Восстанавливает форматирование после добавления в контейнер
                 restoreFormatting(block, blockView);
 
                 // Настройка фокуса и слушателей
@@ -346,15 +343,6 @@ public class BlockManager {
         }
     }
 
-    private int countNewlines(String text) {
-        if (text == null) return 0;
-        int count = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') count++;
-        }
-        return count;
-    }
-
     private void restoreFormatting(ContentBlock block, View blockView) {
         if (block instanceof TextBlock && blockView instanceof EditText) {
             TextBlock textBlock = (TextBlock) block;
@@ -363,18 +351,18 @@ public class BlockManager {
             Log.d("BlockManager", "Восстановление TextBlock " + textBlock.getId() +
                     ", HTML: " + (textBlock.getHtmlContent() != null ? textBlock.getHtmlContent() : "null"));
 
-            // Восстанавливаем форматирование из HTML
+            // Восстанавливает форматирование из HTML
             if (textBlock.getHtmlContent() != null && !textBlock.getHtmlContent().isEmpty()) {
                 try {
                     SpannableString spannable = textBlock.htmlToSpannable(textBlock.getHtmlContent());
                     editText.setText(spannable);
 
-                    // ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ Spannable в TextBlock
+                    // принудителтное обновление Spannable в TextBlock
                     if (editText.getText() instanceof Spannable) {
                         textBlock.updateHtmlFromSpannable((Spannable) editText.getText());
                     }
 
-                    // Проверяем результат
+                    // Проверка результата
                     AbsoluteSizeSpan[] spans = spannable.getSpans(0, spannable.length(), AbsoluteSizeSpan.class);
                     Log.d("BlockManager", "Спанов после восстановления: " + spans.length);
 
@@ -388,7 +376,7 @@ public class BlockManager {
         }
     }
 
-    // ДОБАВЛЯЕМ: настройку отслеживания фокуса
+    // Настройка отслеживания фокуса
     private void setupFocusTracking(TextBlock textBlock, View blockView) {
         if (blockView instanceof EditText) {
             EditText editText = (EditText) blockView;
@@ -414,12 +402,12 @@ public class BlockManager {
     }
 
     public List<ContentBlock> getBlocks() {
-        // ОБНОВЛЯЕМ ДАННЫЕ ПЕРЕД ВОЗВРАТОМ
+        // Обновление данных перед возвратом
         updateAllBlocksFromViews();
         return blocks;
     }
 
-    // ДОБАВЛЯЕМ: метод для получения индекса блока по ID
+    // Метод для получения индекса блока по ID
     public int getBlockIndexById(String blockId) {
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i).getId().equals(blockId)) {
@@ -429,62 +417,6 @@ public class BlockManager {
         return -1;
     }
 
-    //    public String getContentPreview() {
-//        updateAllBlocksFromViews();
-//
-//        if (blocks.isEmpty()) return "Новый документ"; // Заглушка для пустых файлов
-//
-//        StringBuilder preview = new StringBuilder();
-//        int maxBlocks = Math.min(3, blocks.size());
-//        int maxLength = 77; // Максимальная длина превью
-//
-//        for (int i = 0; i < maxBlocks; i++) {
-//            ContentBlock block = blocks.get(i);
-//            if (block instanceof TextBlock) {
-//                TextBlock textBlock = (TextBlock) block;
-//                String plainText = textBlock.getPlainText();
-//                if (plainText != null && !plainText.trim().isEmpty()) {
-//                    // ОБРЕЗАЕМ каждый текстовый блок, чтобы не превысить общий лимит
-//                    int remainingLength = maxLength - preview.length();
-//                    if (remainingLength <= 0) break;
-//
-//                    String textToAdd = plainText.trim();
-//                    if (textToAdd.length() > remainingLength) {
-//                        textToAdd = textToAdd.substring(0, remainingLength);
-//                    }
-//
-//                    preview.append(textToAdd);
-//                    if (preview.length() < maxLength) {
-//                        preview.append(" ");
-//                    }
-//
-//                    Log.d("ContentPreview", "Добавлен текст для превью: '" + textToAdd + "'");
-//                }
-//            }
-//        }
-//
-//        String result = preview.toString().trim();
-//
-//        // ДОПОЛНИТЕЛЬНОЕ ОБРЕЗАНИЕ на случай если мы превысили лимит
-//        if (result.length() > maxLength) {
-//            result = result.substring(0, maxLength);
-//        }
-//
-//        // УБИРАЕМ многоточие если текст короткий
-//        if (result.length() <= maxLength - 3) {
-//            result = result.trim();
-//        } else {
-//            result = result + "...";
-//        }
-//
-//        // Если всё ещё пусто - ставим заглушку
-//        if (result.isEmpty()) {
-//            result = "Новый документ";
-//        }
-//
-//        Log.d("ContentPreview", "Итоговое превью (" + result.length() + " символов): '" + result + "'");
-//        return result;
-//    }
     public String getContentPreview() {
         StringBuilder preview = new StringBuilder();
         boolean hasContent = false;
@@ -523,7 +455,7 @@ public class BlockManager {
         // Реализация если нужна
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД ОБНОВЛЕНИЯ
+    // МЕТОД ОБНОВЛЕНИЯ данных
     public void updateAllBlocksFromViews() {
         for (int i = 0; i < Math.min(container.getChildCount(), blocks.size()); i++) {
             View blockView = container.getChildAt(i);
@@ -534,7 +466,7 @@ public class BlockManager {
                     TextBlock textBlock = (TextBlock) block;
                     EditText editText = (EditText) blockView;
 
-                    // Сохраняем Spannable в HTML только если есть реальное форматирование
+                    // Сохранение Spannable в HTML только если есть реальное форматирование
                     if (editText.getText() instanceof Spannable) {
                         Spannable spannable = (Spannable) editText.getText();
                         textBlock.updateHtmlFromSpannable(spannable);
@@ -555,18 +487,10 @@ public class BlockManager {
         return null;
     }
 
-    // ДОБАВЛЯЕМ: слушатель удаления таблицы
+    // Слушатель удаления таблицы
     private TableBlock.OnTableDeleteListener tableDeleteListener;
 
     public void setTableDeleteListener(TableBlock.OnTableDeleteListener listener) {
         this.tableDeleteListener = listener;
-    }
-
-    public void insertBlockWithoutSaving(int position, ContentBlock block) {
-        // Обновляем данные из текущих View
-        updateAllBlocksFromViews();
-
-        blocks.add(position, block);
-        // НЕ вызываем renderBlocks здесь - это будет сделано позже
     }
 }

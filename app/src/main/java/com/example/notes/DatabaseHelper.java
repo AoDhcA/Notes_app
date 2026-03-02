@@ -61,18 +61,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Добавление документа
-    public long addDocument(DocxFile docxFile) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_TITLE, docxFile.getFileName());
-        values.put(COLUMN_FILE_PATH, docxFile.getFilePath());
-        values.put(COLUMN_PREVIEW_TEXT, docxFile.getPreviewText());
-        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());
-
-        long id = db.insert(TABLE_DOCUMENTS, null, values);
-        db.close();
-        return id;
-    }
+//    public long addDocument(DocxFile docxFile) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put(COLUMN_TITLE, docxFile.getFileName());
+//        values.put(COLUMN_FILE_PATH, docxFile.getFilePath());
+//        values.put(COLUMN_PREVIEW_TEXT, docxFile.getPreviewText());
+//        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());
+//
+//        long id = db.insert(TABLE_DOCUMENTS, null, values);
+//        db.close();
+//        return id;
+//    }
 
 //    public List<DocxFile> getAllDocuments() {
 //        List<DocxFile> documentList = new ArrayList<>();
@@ -180,26 +180,26 @@ public synchronized List<DocxFile> getAllDocuments() {
 
     return documentList;
 }
-    public int updateDocument(String filePath, String newFileName, String newPreview) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        long currentTime = System.currentTimeMillis();
-
-        // ПРОСТО сохраняем то, что нам передали
-        if (newFileName != null) {
-            values.put(COLUMN_TITLE, newFileName);
-        }
-        if (newPreview != null) {
-            values.put(COLUMN_PREVIEW_TEXT, newPreview);
-        }
-        values.put(COLUMN_UPDATED_AT, currentTime);
-
-        int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
-                new String[]{filePath});
-        db.close();
-        return result;
-    }
+//    public int updateDocument(String filePath, String newFileName, String newPreview) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//
+//        long currentTime = System.currentTimeMillis();
+//
+//        // ПРОСТО сохраняем то, что нам передали
+//        if (newFileName != null) {
+//            values.put(COLUMN_TITLE, newFileName);
+//        }
+//        if (newPreview != null) {
+//            values.put(COLUMN_PREVIEW_TEXT, newPreview);
+//        }
+//        values.put(COLUMN_UPDATED_AT, currentTime);
+//
+//        int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
+//                new String[]{filePath});
+//        db.close();
+//        return result;
+//    }
 
     // Удаление документа
     public synchronized void deleteDocument(String filePath) {
@@ -209,19 +209,19 @@ public synchronized List<DocxFile> getAllDocuments() {
     }
 
     // Проверка существования документа
-    public boolean documentExists(String filePath) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_DOCUMENTS, new String[]{COLUMN_ID},
-                COLUMN_FILE_PATH + " = ?", new String[]{filePath}, null, null, null);
-
-        boolean exists = (cursor != null && cursor.getCount() > 0);
-
-        if (cursor != null) {
-            cursor.close();
-        }
-        db.close();
-        return exists;
-    }
+//    public boolean documentExists(String filePath) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.query(TABLE_DOCUMENTS, new String[]{COLUMN_ID},
+//                COLUMN_FILE_PATH + " = ?", new String[]{filePath}, null, null, null);
+//
+//        boolean exists = (cursor != null && cursor.getCount() > 0);
+//
+//        if (cursor != null) {
+//            cursor.close();
+//        }
+//        db.close();
+//        return exists;
+//    }
 
     // Поиск документов
     public synchronized List<DocxFile> searchDocuments(String query) {
@@ -308,56 +308,56 @@ public synchronized List<DocxFile> getAllDocuments() {
         return tags;
     }
 
-    public int updateDocumentTags(String filePath, String tags) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_TAGS, tags);
-        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());
-
-        int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
-                new String[]{filePath});
-        db.close();
-        return result;
-    }
+//    public int updateDocumentTags(String filePath, String tags) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put(COLUMN_TAGS, tags);
+//        values.put(COLUMN_UPDATED_AT, System.currentTimeMillis());
+//
+//        int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
+//                new String[]{filePath});
+//        db.close();
+//        return result;
+//    }
 
 
     /**
      * Получить все уникальные теги из базы данных
      */
-    public List<String> getAllUniqueTags() {
-        List<String> allTags = new ArrayList<>();
-        Set<String> uniqueTags = new HashSet<>();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_DOCUMENTS,
-                new String[]{COLUMN_TAGS},
-                null, null, null, null, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                int tagsIndex = cursor.getColumnIndex(COLUMN_TAGS);
-                if (tagsIndex != -1) {
-                    String tagsString = cursor.getString(tagsIndex);
-                    if (tagsString != null && !tagsString.trim().isEmpty()) {
-                        // Разделяем теги по запятой
-                        String[] tags = tagsString.split(",");
-                        for (String tag : tags) {
-                            String cleanedTag = tag.trim();
-                            if (!cleanedTag.isEmpty()) {
-                                uniqueTags.add(cleanedTag);
-                            }
-                        }
-                    }
-                }
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        db.close();
-
-        allTags.addAll(uniqueTags);
-        Collections.sort(allTags);
-        return allTags;
-    }
+//    public List<String> getAllUniqueTags() {
+//        List<String> allTags = new ArrayList<>();
+//        Set<String> uniqueTags = new HashSet<>();
+//
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.query(TABLE_DOCUMENTS,
+//                new String[]{COLUMN_TAGS},
+//                null, null, null, null, null);
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            do {
+//                int tagsIndex = cursor.getColumnIndex(COLUMN_TAGS);
+//                if (tagsIndex != -1) {
+//                    String tagsString = cursor.getString(tagsIndex);
+//                    if (tagsString != null && !tagsString.trim().isEmpty()) {
+//                        // Разделяем теги по запятой
+//                        String[] tags = tagsString.split(",");
+//                        for (String tag : tags) {
+//                            String cleanedTag = tag.trim();
+//                            if (!cleanedTag.isEmpty()) {
+//                                uniqueTags.add(cleanedTag);
+//                            }
+//                        }
+//                    }
+//                }
+//            } while (cursor.moveToNext());
+//            cursor.close();
+//        }
+//        db.close();
+//
+//        allTags.addAll(uniqueTags);
+//        Collections.sort(allTags);
+//        return allTags;
+//    }
 
 
     public synchronized List<DocxFile> searchByTags(String[] tags) {
@@ -586,10 +586,10 @@ public synchronized List<DocxFile> getAllDocuments() {
     /**
      * Получить дату создания в формате дд.мм.гггг
      */
-    private String getFormattedDate(long timestamp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        return sdf.format(new Date(timestamp));
-    }
+//    private String getFormattedDate(long timestamp) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+//        return sdf.format(new Date(timestamp));
+//    }
 
     /**
      * Обновить теги документа с добавлением дат
@@ -644,72 +644,72 @@ public synchronized List<DocxFile> getAllDocuments() {
 //
 //        db.close();
 //    }
-    public int updateDocumentWithAutoTags(String filePath, String newFileName,
-                                          String newPreview, long createdAt, long updatedAt) {
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-
-            // Сначала получим существующие теги
-            String currentTags = getDocumentTags(filePath);
-            List<String> tagsList = new ArrayList<>();
-
-            // Добавляем существующие теги (если есть и это не даты)
-            if (currentTags != null && !currentTags.trim().isEmpty()) {
-                String[] existingTags = currentTags.split(",");
-                for (String tag : existingTags) {
-                    String cleaned = tag.trim();
-                    if (!cleaned.isEmpty() && !cleaned.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
-                        // Добавляем только не-даты (теги пользователя)
-                        tagsList.add(cleaned);
-                    }
-                }
-            }
-
-            // Добавляем дату создания
-            String createdDateTag = getFormattedDate(createdAt);
-            if (!tagsList.contains(createdDateTag)) {
-                tagsList.add(createdDateTag);
-            }
-
-            // Добавляем дату обновления (ВСЕГДА, даже если совпадает с созданием)
-            String updatedDateTag = getFormattedDate(updatedAt);
-            if (!tagsList.contains(updatedDateTag)) {
-                tagsList.add(updatedDateTag);
-            }
-
-            // Формируем строку тегов
-            String updatedTags = TextUtils.join(",", tagsList);
-
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_TITLE, newFileName);
-            values.put(COLUMN_PREVIEW_TEXT, newPreview);
-            values.put(COLUMN_UPDATED_AT, updatedAt);
-            values.put(COLUMN_TAGS, updatedTags);
-
-            int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
-                    new String[]{filePath});
-
-            if (result > 0) {
-                Log.d("AutoTags", "✅ Автотеги обновлены: " + updatedTags);
-            }
-
-            return result;
-
-        } catch (Exception e) {
-            Log.e("AutoTags", "❌ Ошибка обновления автотегов", e);
-            return 0;
-        } finally {
-            // ВАЖНО: Закрываем базу только здесь
-            if (db != null && db.isOpen()) {
-                try {
-                    db.close();
-                } catch (Exception e) {
-                    Log.e("Database", "Ошибка при закрытии базы", e);
-                }
-            }
-        }
-    }
+//    public int updateDocumentWithAutoTags(String filePath, String newFileName,
+//                                          String newPreview, long createdAt, long updatedAt) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = this.getWritableDatabase();
+//
+//            // Сначала получим существующие теги
+//            String currentTags = getDocumentTags(filePath);
+//            List<String> tagsList = new ArrayList<>();
+//
+//            // Добавляем существующие теги (если есть и это не даты)
+//            if (currentTags != null && !currentTags.trim().isEmpty()) {
+//                String[] existingTags = currentTags.split(",");
+//                for (String tag : existingTags) {
+//                    String cleaned = tag.trim();
+//                    if (!cleaned.isEmpty() && !cleaned.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+//                        // Добавляем только не-даты (теги пользователя)
+//                        tagsList.add(cleaned);
+//                    }
+//                }
+//            }
+//
+//            // Добавляем дату создания
+//            String createdDateTag = getFormattedDate(createdAt);
+//            if (!tagsList.contains(createdDateTag)) {
+//                tagsList.add(createdDateTag);
+//            }
+//
+//            // Добавляем дату обновления (ВСЕГДА, даже если совпадает с созданием)
+//            String updatedDateTag = getFormattedDate(updatedAt);
+//            if (!tagsList.contains(updatedDateTag)) {
+//                tagsList.add(updatedDateTag);
+//            }
+//
+//            // Формируем строку тегов
+//            String updatedTags = TextUtils.join(",", tagsList);
+//
+//            ContentValues values = new ContentValues();
+//            values.put(COLUMN_TITLE, newFileName);
+//            values.put(COLUMN_PREVIEW_TEXT, newPreview);
+//            values.put(COLUMN_UPDATED_AT, updatedAt);
+//            values.put(COLUMN_TAGS, updatedTags);
+//
+//            int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
+//                    new String[]{filePath});
+//
+//            if (result > 0) {
+//                Log.d("AutoTags", "✅ Автотеги обновлены: " + updatedTags);
+//            }
+//
+//            return result;
+//
+//        } catch (Exception e) {
+//            Log.e("AutoTags", "❌ Ошибка обновления автотегов", e);
+//            return 0;
+//        } finally {
+//            // ВАЖНО: Закрываем базу только здесь
+//            if (db != null && db.isOpen()) {
+//                try {
+//                    db.close();
+//                } catch (Exception e) {
+//                    Log.e("Database", "Ошибка при закрытии базы", e);
+//                }
+//            }
+//        }
+//    }
 
 //    public int updateDocumentWithAutoTags(String filePath, String newFileName,
 //                                          String newPreview, long createdAt, long updatedAt) {
@@ -841,61 +841,61 @@ public synchronized List<DocxFile> getAllDocuments() {
 //        Log.d("AutoTags", "📄 Добавлен документ с автотегами: " + tags);
 //        return id;
 //    }
-    public long addDocumentWithAutoTags(DocxFile docxFile, long createdAt, long updatedAt) {
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-
-            // Формируем теги с датами
-            List<String> tagsList = new ArrayList<>();
-
-            // Добавляем пользовательские теги (если есть)
-            if (docxFile.getTags() != null && !docxFile.getTags().trim().isEmpty()) {
-                String[] userTags = docxFile.getTags().split(",");
-                for (String tag : userTags) {
-                    String cleaned = tag.trim();
-                    if (!cleaned.isEmpty()) {
-                        tagsList.add(cleaned);
-                    }
-                }
-            }
-
-            // Добавляем дату создания
-            String createdDateTag = getFormattedDate(createdAt);
-            tagsList.add(createdDateTag);
-
-            // Добавляем дату обновления
-            String updatedDateTag = getFormattedDate(updatedAt);
-            tagsList.add(updatedDateTag);
-
-            String tags = TextUtils.join(",", tagsList);
-
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_TITLE, docxFile.getFileName());
-            values.put(COLUMN_FILE_PATH, docxFile.getFilePath());
-            values.put(COLUMN_PREVIEW_TEXT, docxFile.getPreviewText());
-            values.put(COLUMN_CREATED_AT, createdAt);
-            values.put(COLUMN_UPDATED_AT, updatedAt);
-            values.put(COLUMN_TAGS, tags);
-
-            long id = db.insert(TABLE_DOCUMENTS, null, values);
-
-            Log.d("AutoTags", "📄 Добавлен документ с автотегами: " + tags);
-            return id;
-
-        } catch (Exception e) {
-            Log.e("AutoTags", "❌ Ошибка добавления документа", e);
-            return -1;
-        } finally {
-            if (db != null && db.isOpen()) {
-                try {
-                    db.close();
-                } catch (Exception e) {
-                    Log.e("Database", "Ошибка при закрытии базы", e);
-                }
-            }
-        }
-    }
+//    public long addDocumentWithAutoTags(DocxFile docxFile, long createdAt, long updatedAt) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = this.getWritableDatabase();
+//
+//            // Формируем теги с датами
+//            List<String> tagsList = new ArrayList<>();
+//
+//            // Добавляем пользовательские теги (если есть)
+//            if (docxFile.getTags() != null && !docxFile.getTags().trim().isEmpty()) {
+//                String[] userTags = docxFile.getTags().split(",");
+//                for (String tag : userTags) {
+//                    String cleaned = tag.trim();
+//                    if (!cleaned.isEmpty()) {
+//                        tagsList.add(cleaned);
+//                    }
+//                }
+//            }
+//
+//            // Добавляем дату создания
+//            String createdDateTag = getFormattedDate(createdAt);
+//            tagsList.add(createdDateTag);
+//
+//            // Добавляем дату обновления
+//            String updatedDateTag = getFormattedDate(updatedAt);
+//            tagsList.add(updatedDateTag);
+//
+//            String tags = TextUtils.join(",", tagsList);
+//
+//            ContentValues values = new ContentValues();
+//            values.put(COLUMN_TITLE, docxFile.getFileName());
+//            values.put(COLUMN_FILE_PATH, docxFile.getFilePath());
+//            values.put(COLUMN_PREVIEW_TEXT, docxFile.getPreviewText());
+//            values.put(COLUMN_CREATED_AT, createdAt);
+//            values.put(COLUMN_UPDATED_AT, updatedAt);
+//            values.put(COLUMN_TAGS, tags);
+//
+//            long id = db.insert(TABLE_DOCUMENTS, null, values);
+//
+//            Log.d("AutoTags", "📄 Добавлен документ с автотегами: " + tags);
+//            return id;
+//
+//        } catch (Exception e) {
+//            Log.e("AutoTags", "❌ Ошибка добавления документа", e);
+//            return -1;
+//        } finally {
+//            if (db != null && db.isOpen()) {
+//                try {
+//                    db.close();
+//                } catch (Exception e) {
+//                    Log.e("Database", "Ошибка при закрытии базы", e);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Получить все уникальные теги (включая даты)
@@ -1000,7 +1000,7 @@ public synchronized List<DocxFile> getAllDocuments() {
 
         allTags.addAll(uniqueTags);
 
-        // Сортируем: сначала даты (по убыванию), потом обычные теги
+        // Сортировка: сначала даты (по убыванию), потом обычные теги
         Collections.sort(allTags, new Comparator<String>() {
             @Override
             public int compare(String tag1, String tag2) {
@@ -1040,72 +1040,72 @@ public synchronized List<DocxFile> getAllDocuments() {
 //
 //        return createdAt;
 //    }
-    public long getDocumentCreatedAt(String filePath) {
-        SQLiteDatabase db = null;
-        Cursor cursor = null;
-        long createdAt = 0;
-
-        try {
-            db = this.getReadableDatabase();
-            cursor = db.query(TABLE_DOCUMENTS, new String[]{COLUMN_CREATED_AT},
-                    COLUMN_FILE_PATH + " = ?", new String[]{filePath}, null, null, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                int createdAtIndex = cursor.getColumnIndex(COLUMN_CREATED_AT);
-                if (createdAtIndex != -1) {
-                    createdAt = cursor.getLong(createdAtIndex);
-                }
-                cursor.close();
-            }
-        } catch (Exception e) {
-            Log.e("Database", "Ошибка получения даты создания", e);
-        } finally {
-            if (cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-            if (db != null && db.isOpen()) {
-                try {
-                    db.close();
-                } catch (Exception e) {
-                    Log.e("Database", "Ошибка при закрытии базы", e);
-                }
-            }
-        }
-
-        return createdAt;
-    }
-    public int updateDocumentSimple(String filePath, String newFileName, String newPreview, String newTags) {
-        SQLiteDatabase db = null;
-        try {
-            db = this.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            long currentTime = System.currentTimeMillis();
-
-            if (newFileName != null) {
-                values.put(COLUMN_TITLE, newFileName);
-            }
-            if (newPreview != null) {
-                values.put(COLUMN_PREVIEW_TEXT, newPreview);
-            }
-            if (newTags != null) {
-                values.put(COLUMN_TAGS, newTags);
-            }
-            values.put(COLUMN_UPDATED_AT, currentTime);
-
-            int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
-                    new String[]{filePath});
-
-            Log.d("UpdateSimple", "✅ Документ обновлен: " + filePath);
-            return result;
-
-        } catch (Exception e) {
-            Log.e("UpdateSimple", "❌ Ошибка обновления документа", e);
-            return 0;
-        } finally {
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
-        }
-    }
+//    public long getDocumentCreatedAt(String filePath) {
+//        SQLiteDatabase db = null;
+//        Cursor cursor = null;
+//        long createdAt = 0;
+//
+//        try {
+//            db = this.getReadableDatabase();
+//            cursor = db.query(TABLE_DOCUMENTS, new String[]{COLUMN_CREATED_AT},
+//                    COLUMN_FILE_PATH + " = ?", new String[]{filePath}, null, null, null);
+//
+//            if (cursor != null && cursor.moveToFirst()) {
+//                int createdAtIndex = cursor.getColumnIndex(COLUMN_CREATED_AT);
+//                if (createdAtIndex != -1) {
+//                    createdAt = cursor.getLong(createdAtIndex);
+//                }
+//                cursor.close();
+//            }
+//        } catch (Exception e) {
+//            Log.e("Database", "Ошибка получения даты создания", e);
+//        } finally {
+//            if (cursor != null && !cursor.isClosed()) {
+//                cursor.close();
+//            }
+//            if (db != null && db.isOpen()) {
+//                try {
+//                    db.close();
+//                } catch (Exception e) {
+//                    Log.e("Database", "Ошибка при закрытии базы", e);
+//                }
+//            }
+//        }
+//
+//        return createdAt;
+//    }
+//    public int updateDocumentSimple(String filePath, String newFileName, String newPreview, String newTags) {
+//        SQLiteDatabase db = null;
+//        try {
+//            db = this.getWritableDatabase();
+//
+//            ContentValues values = new ContentValues();
+//            long currentTime = System.currentTimeMillis();
+//
+//            if (newFileName != null) {
+//                values.put(COLUMN_TITLE, newFileName);
+//            }
+//            if (newPreview != null) {
+//                values.put(COLUMN_PREVIEW_TEXT, newPreview);
+//            }
+//            if (newTags != null) {
+//                values.put(COLUMN_TAGS, newTags);
+//            }
+//            values.put(COLUMN_UPDATED_AT, currentTime);
+//
+//            int result = db.update(TABLE_DOCUMENTS, values, COLUMN_FILE_PATH + " = ?",
+//                    new String[]{filePath});
+//
+//            Log.d("UpdateSimple", "✅ Документ обновлен: " + filePath);
+//            return result;
+//
+//        } catch (Exception e) {
+//            Log.e("UpdateSimple", "❌ Ошибка обновления документа", e);
+//            return 0;
+//        } finally {
+//            if (db != null && db.isOpen()) {
+//                db.close();
+//            }
+//        }
+//    }
 }

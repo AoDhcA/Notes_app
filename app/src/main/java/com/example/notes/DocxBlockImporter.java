@@ -468,7 +468,7 @@ public class DocxBlockImporter {
                     Log.d("ImportDebug", "Создан обычный текстовый блок с <br>: '" + htmlWithBreaks + "'");
                 } else {
                     textBlock.setRawContent(plainText);
-                    Log.d("ImportDebug", "Создан обычный текстовый блок: '" + plainText + "'");
+                    Log.d("ImportDebug  ", "Создан обычный текстовый блок: '" + plainText + "'");
                 }
             }
 
@@ -490,14 +490,4 @@ public class DocxBlockImporter {
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
     }
-
-//    private static boolean containsLineBreaks(List<XWPFRun> runs) {
-//        for (XWPFRun run : runs) {
-//            String text = run.getText(0);
-//            if (text != null && text.contains("\n")) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

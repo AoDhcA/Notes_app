@@ -69,17 +69,17 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     private List<ContentBlock> originalBlocks = new ArrayList<>();
     private boolean isInitialLoadComplete = false;
 
-    // ДОБАВЛЯЕМ: поля для блочного редактора
+    // Поля для блочного редактора
     private LinearLayout blocksContainer;
     private BlockManager blockManager;
     private CardView btnAddTable;
 
-    // ДОБАВЛЯЕМ: поля для отслеживания курсора
+    // Поля для отслеживания курсора
     private String focusedBlockId = null;
     private int cursorPosition = 0;
     private EditText focusedEditText = null;
 
-    // поля для диалога редактирования таблицы
+    // Поля для диалога редактирования таблицы
     private CardView tableEditDialog;
     private EditText editRows, editColumns;
     private TagEditText tagEditText;
@@ -322,7 +322,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    // ОБНОВЛЯЕМ: метод обновления размера из выделения
+    // Метод обновления размера из выделения
     private void updateCurrentFontSizeFromSelection() {
         Log.d("FontSizeDebug", "updateCurrentFontSizeFromSelection вызван");
         Log.d("FontSizeDebug", "focusedBlockId: " + focusedBlockId);
@@ -352,7 +352,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     }
 
 
-    // ПЕРЕПИСЫВАЕМ: метод для получения размера шрифта в позиции
+    // Метод для получения размера шрифта в позиции
     private int getFontSizeAtPosition(int position) {
         Log.d("FontSizeDebug", "getFontSizeAtPosition: position=" + position);
 
@@ -370,16 +370,16 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         return 16;
     }
 
-    private int spToPx(float sp) {
-        return (int) (sp * getResources().getDisplayMetrics().scaledDensity);
-    }
-
-    private int pxToSp(float px) {
-        float scaledDensity = getResources().getDisplayMetrics().scaledDensity;
-        int sp = (int) (px / scaledDensity);
-        Log.d("FontSizeDebug", "Конвертация px to sp: " + px + "px -> " + sp + "sp");
-        return sp;
-    }
+//    private int spToPx(float sp) {
+//        return (int) (sp * getResources().getDisplayMetrics().scaledDensity);
+//    }
+//
+//    private int pxToSp(float px) {
+//        float scaledDensity = getResources().getDisplayMetrics().scaledDensity;
+//        int sp = (int) (px / scaledDensity);
+//        Log.d("FontSizeDebug", "Конвертация px to sp: " + px + "px -> " + sp + "sp");
+//        return sp;
+//    }
 
     private void adjustFontSize(int delta) {
         Log.d("FontSizeDebug", "adjustFontSize вызван: delta=" + delta + ", currentFontSize=" + currentFontSize);
@@ -444,35 +444,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             Log.e("FontSizeDebug", "currentTextSizeTV равен null!");
         }
     }
-
-//    private void setupTextChangeListener() {
-//        if (focusedEditText != null) {
-//            focusedEditText.addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                }
-//
-//                @Override
-//                public void afterTextChanged(Editable s) {
-//                    // Обновляем блок при изменении текста
-//                    if (focusedBlockId != null) {
-//                        ContentBlock block = blockManager.getBlockById(focusedBlockId);
-//                        if (block instanceof TextBlock) {
-//                            TextBlock textBlock = (TextBlock) block;
-//                            if (s instanceof Spannable) {
-//                                textBlock.updateHtmlFromSpannable((Spannable) s);
-//                            }
-//                            markContentChanged();
-//                        }
-//                    }
-//                }
-//            });
-//        }
-//    }
 
     private void setupTextChangeListener() {
         if (focusedEditText != null) {
@@ -550,7 +521,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         });
     }
 
-    // ДОБАВЛЯЕМ: метод для показа диалога редактирования
+    // Метод для показа диалога редактирования
     public void showTableEditDialog(TableBlock tableBlock) {
         this.currentEditingTable = tableBlock;
 
@@ -569,7 +540,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         editRows.requestFocus();
     }
 
-    // ДОБАВЛЯЕМ: метод для скрытия диалога
+    // Метод для скрытия диалога
     private void hideTableEditDialog() {
         // Скрываем клавиатуру перед закрытием диалога
         hideKeyboard();
@@ -579,7 +550,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         setBackgroundDim(false);
     }
 
-    // ДОБАВЛЯЕМ: метод для применения изменений
+    // Метод для применения изменений
     private void applyTableChanges() {
         if (currentEditingTable == null) return;
 
@@ -604,7 +575,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    // ДОБАВЛЯЕМ: методы для работы с клавиатурой
+    // Методы для работы с клавиатурой
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
@@ -616,7 +587,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для затемнения фона
+    // Метод для затемнения фона
     private void setBackgroundDim(boolean dim) {
         View mainContent = findViewById(R.id.mainContent);
         if (mainContent != null) {
@@ -741,7 +712,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         return new File(getFilesDir(), "Documents");
     }
 
-
     private void initViews() {
         try {
             titleEditText = findViewById(R.id.titleEditText);
@@ -771,14 +741,12 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
                 }
             });
 
-            // ДОБАВЛЯЕМ: установка слушателя фокуса
-            // ДОБАВЛЯЕМ: установка слушателя фокуса ЕСЛИ ОН ЕСТЬ В BlockManager
+            // Установка слушателя фокуса ЕСЛИ ОН ЕСТЬ В BlockManager
             try {
                 blockManager.setBlockFocusListener(this);
             } catch (Exception e) {
                 Log.w("InitViews", "BlockFocusListener not available: " + e.getMessage());
             }
-            //setupGlobalFocusListener();
 
             // Настройка слушателей
             setupAdditionalButtons();
@@ -872,7 +840,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         Log.d("Debug", "=== END DEBUG INFO ===");
     }
 
-    // ДОБАВЛЯЕМ: основной метод удаления таблицы и объединения текста
+    // Основной метод удаления таблицы и объединения текста
     private void deleteTableAndMergeText(TableBlock tableBlockToDelete) {
         try {
             // ОБНОВЛЯЕМ ДАННЫЕ ИЗ ВСЕХ VIEW ПЕРЕД ОПЕРАЦИЕЙ
@@ -937,9 +905,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    /**
-     * Немедленно обновляет View текстового блока с применением форматирования
-     */
+    // Немедленно обновляет View текстового блока с применением форматирования
     private void updateTextBlockViewWithFormatting(TextBlock textBlock) {
         int blockIndex = blockManager.getBlockIndexById(textBlock.getId());
         if (blockIndex == -1) return;
@@ -963,7 +929,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     }
 
 
-    // ДОБАВЛЯЕМ: рекурсивный поиск EditText в сложных View
+    // Рекурсивный поиск EditText в сложных View
     private void findAndUpdateEditTextImmediately(View view, String newText) {
         if (view instanceof EditText) {
             EditText editText = (EditText) view;
@@ -977,7 +943,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для поиска предыдущего текстового блока
+    // Метод для поиска предыдущего текстового блока
     private TextBlock findPreviousTextBlock(List<ContentBlock> blocks, int currentIndex) {
         for (int i = currentIndex - 1; i >= 0; i--) {
             ContentBlock block = blocks.get(i);
@@ -988,7 +954,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         return null;
     }
 
-    // ДОБАВЛЯЕМ: метод для поиска следующего текстового блока
+    // Метод для поиска следующего текстового блока
     private TextBlock findNextTextBlock(List<ContentBlock> blocks, int currentIndex) {
         for (int i = currentIndex + 1; i < blocks.size(); i++) {
             ContentBlock block = blocks.get(i);
@@ -1091,7 +1057,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
 
     // ДОБАВЛЯЕМ: метод для отметки изменений
     private void markContentChanged() {
-        // ДОБАВИМ: проверяем, что загрузка завершена
+        // Проверяем, что загрузка завершена
         if (!isNewFile && !isInitialLoadComplete) {
             Log.d("ChangeDebug", "⏳ Изменение проигнорировано - начальная загрузка не завершена");
             return;
@@ -1162,7 +1128,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         dialog.show();
     }
 
-    // ДОБАВЛЯЕМ: метод для поиска индекса блока по ID
+    // Метод для поиска индекса блока по ID
     private int findBlockIndexById(String blockId) {
         List<ContentBlock> blocks = blockManager.getBlocks();
         for (int i = 0; i < blocks.size(); i++) {
@@ -1213,14 +1179,12 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
 
                     hideKeyboard(dialog);
 
-                    // УДАЛИТЕ safeBlockOperation и вызывайте напрямую:
                     if (onCursor) {
                         TableBlock tableBlock = new TableBlock(rows, cols);
                         blockManager.addBlock(tableBlock);
                         TextBlock textBlock = new TextBlock();
                         blockManager.addBlock(textBlock);
                     } else {
-                        // Вызываем напрямую без safeBlockOperation
                         insertTableAtCursorOriginal(rows, cols);
                     }
 
@@ -1348,75 +1312,13 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         return null;
     }
 
-    //    private void saveAndExit() {
-//        Log.d("SaveDebug", "=== НАЧАЛО СОХРАНЕНИЯ ===");
-//        Log.d("SaveDebug", "isNewFile: " + isNewFile);
-//        Log.d("SaveDebug", "filePath: " + filePath);
-//        Log.d("SaveDebug", "isContentChanged: " + isContentChanged);
-//
-//        // ВСЕГДА ОБНОВЛЯЕМ ДАННЫЕ ПЕРЕД ПРОВЕРКОЙ
-//        blockManager.updateAllBlocksFromViews();
-//
-//        List<ContentBlock> blocks = blockManager.getBlocks();
-//
-//        // ТОЧНАЯ ПРОВЕРКА ИЗМЕНЕНИЙ
-//        boolean shouldSave = hasRealChanges();
-//
-//        if (!shouldSave) {
-//            Log.d("SaveDebug", "❌ Реальных изменений нет, выходим без сохранения");
-//            finish();
-//            return;
-//        }
-//
-//        Log.d("SaveDebug", "✅ Обнаружены изменения, сохраняем файл");
-//
-//        String newFileName = titleEditText.getText().toString().trim();
-//        Log.d("SaveDebug", "📝 Новое имя файла: '" + newFileName + "'");
-//
-//        // Если имя файла пустое, генерируем из содержимого
-//        if (newFileName.isEmpty()) {
-//            String contentPreview = blockManager.getContentPreview();
-//            if (!contentPreview.isEmpty()) {
-//                newFileName = generateFileNameFromContent(contentPreview, 25);
-//                Toast.makeText(this, "Автоназвание: " + newFileName, Toast.LENGTH_LONG).show();
-//                Log.d("SaveDebug", "🔤 Сгенерировано автоназвание: " + newFileName);
-//            } else {
-//                // Если нет содержимого и нет названия - просто выходим
-//                Log.d("SaveDebug", "❌ Нечего сохранять - пустой документ без названия");
-//                finish();
-//                return;
-//            }
-//        }
-//
-//        // Получаем теги ДО запуска AsyncTask
-//        // ПОЛУЧАЕМ ПРЕВЬЮ ИЗ БЛОК-МЕНЕДЖЕРА
-//        String preview = blockManager.getContentPreview();
-//        String currentTags = tagEditText.getTagsForStorage();
-//
-//        Log.d("SaveDebug", "📝 Превью для сохранения: '" + preview + "'");
-//
-//        new SaveFileTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (!isNewFile) {
-//                    originalTitle = titleEditText.getText().toString().trim();
-//                    originalTags = currentTags;
-//                    saveOriginalBlocksState();
-//                    isContentChanged = false;
-//                    updateActivityTitle();
-//                }
-//                finish();
-//            }
-//        }, currentTags, preview).execute(newFileName);
-//        hideKeyboard();
-//    }
     private void saveAndExit() {
         Log.d("SaveDebug", "=== НАЧАЛО СОХРАНЕНИЯ ===");
         Log.d("SaveDebug", "isNewFile: " + isNewFile);
         Log.d("SaveDebug", "filePath: " + filePath);
         Log.d("SaveDebug", "isContentChanged: " + isContentChanged);
 
-        // ВСЕГДА ОБНОВЛЯЕМ ДАННЫЕ ПЕРЕД ПРОВЕРКОЙ
+        // ОБНОВЛЯЕМ ДАННЫЕ ПЕРЕД ПРОВЕРКОЙ
         blockManager.updateAllBlocksFromViews();
 
         // Для НОВЫХ файлов проверяем, не пустой ли документ
@@ -1490,43 +1392,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         hideKeyboard();
     }
 
-//    private String generateFileNameFromContent(String content, int maxLength) {
-//        if (content == null || content.trim().isEmpty()) {
-//            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-//            return "Заметка " + sdf.format(new java.util.Date());
-//        }
-//
-//        String cleaned = content.trim()
-//                .replaceAll("\\s+", " ")
-//                .replaceAll("\\n+", " ")
-//                .replaceAll("[\\\\/:*?\"<>|]", "")
-//                .replaceAll("^[\\s\\p{Punct}]+", "")
-//                .replaceAll("[\\s\\p{Punct}]+$", "")
-//                .trim();
-//
-//        if (cleaned.isEmpty()) {
-//            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-//            return "Заметка " + sdf.format(new java.util.Date());
-//        }
-//
-//        if (cleaned.length() <= maxLength) {
-//            return cleaned;
-//        }
-//
-//        String truncated = cleaned.substring(0, maxLength);
-//        int lastSpace = truncated.lastIndexOf(' ');
-//        int lastPunctuation = Math.max(
-//                truncated.lastIndexOf('.'),
-//                Math.max(truncated.lastIndexOf('!'), truncated.lastIndexOf('?'))
-//        );
-//
-//        int cutIndex = Math.max(lastSpace, lastPunctuation);
-//        if (cutIndex > maxLength / 2) {
-//            return truncated.substring(0, cutIndex).trim();
-//        }
-//
-//        return truncated.trim() + "...";
-//    }
 private String generateFileNameFromContent(String content, int maxLength) {
     if (content == null || content.trim().isEmpty() || content.equals("Пустой документ")) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
@@ -1642,7 +1507,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
                     titleEditText.setText(displayName);
                     originalTitle = displayName;
 
-                    // ВАЖНО: Сохраняем исходное состояние ПОСЛЕ того как все блоки добавлены
+                    // Сохраняем исходное состояние ПОСЛЕ того как все блоки добавлены
                     saveOriginalBlocksState();
 
                     isInitialLoadComplete = true; // УСТАНАВЛИВАЕМ ФЛАГ
@@ -1656,420 +1521,6 @@ private String generateFileNameFromContent(String content, int maxLength) {
         }.execute();
     }
 
-    //    private class SaveFileTask extends AsyncTask<String, Void, Boolean> {
-//        private Runnable onSuccessCallback;
-//        private String tags;
-//        private String preview; // ДОБАВЛЯЕМ: храним превью
-//
-//        public SaveFileTask(Runnable onSuccessCallback, String tags, String preview) {
-//            this.onSuccessCallback = onSuccessCallback;
-//            this.tags = tags;
-//            this.preview = preview;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            try {
-//                String newFileName = params[0];
-//
-//                if (!newFileName.toLowerCase().endsWith(".docx")) {
-//                    newFileName += ".docx";
-//                }
-//
-//                File originalFile = new File(filePath);
-//                File newFile = new File(originalFile.getParent(), newFileName);
-//
-//                if (!newFile.getAbsolutePath().equals(originalFile.getAbsolutePath())) {
-//                    if (newFile.exists()) {
-//                        int counter = 1;
-//                        String baseName = newFileName.replace(".docx", "");
-//                        while (newFile.exists()) {
-//                            newFileName = baseName + " (" + counter + ").docx";
-//                            newFile = new File(originalFile.getParent(), newFileName);
-//                            counter++;
-//                        }
-//                    }
-//
-//                    if (!isNewFile && originalFile.exists()) {
-//                        originalFile.delete();
-//                    }
-//                }
-//
-//                filePath = newFile.getAbsolutePath();
-//
-//                // Сохраняем через блочный экспортер
-//                List<ContentBlock> blocks = blockManager.getBlocks();
-//                DocxBlockExporter.exportToDocx(blocks, filePath);
-//
-//                String preview = blockManager.getContentPreview();
-//
-//                Log.d("SaveDebug", "💾 Сохранение файла: " + newFileName);
-//                Log.d("SaveDebug", "💾 Путь файла: " + filePath);
-//                Log.d("SaveDebug", "💾 Превью: '" + preview + "'");
-//                Log.d("SaveDebug", "💾 isNewFile: " + isNewFile);
-//
-//                // ИСПРАВЛЯЕМ: для новых файлов используем addDocument, для существующих - updateDocument
-//                if (isNewFile) {
-//                    // ДОБАВЛЯЕМ новый файл в БД
-//                    DocxFile newDoc = new DocxFile(newFileName, preview, filePath, System.currentTimeMillis());
-//                    long result = databaseHelper.addDocument(newDoc);
-//                    Log.d("SaveDebug", "✅ Новый файл добавлен в БД с ID: " + result);
-//                } else {
-//                    // ОБНОВЛЯЕМ существующий файл
-//                    int result = databaseHelper.updateDocument(filePath, newFileName, preview);
-//                    Log.d("SaveDebug", "✅ Существующий файл обновлен в БД: " + result + " строк");
-//                }
-//
-//                // Обновляем теги
-//                databaseHelper.updateDocumentTags(filePath, tags);
-//
-//                return true;
-//
-//            } catch (Exception e) {
-//                Log.e("SaveDebug", "❌ Ошибка сохранения: " + e.getMessage(), e);
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean success) {
-//            if (success) {
-//                isContentChanged = false;
-//                isNewFile = false;
-//                originalFileName = new File(filePath).getName();
-//
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Файл сохранен", Toast.LENGTH_SHORT).show();
-//
-//                if (onSuccessCallback != null) {
-//                    onSuccessCallback.run();
-//                }
-//            } else {
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Ошибка при сохранении", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-//    private class SaveFileTask extends AsyncTask<String, Void, Boolean> {
-//        private Runnable onSuccessCallback;
-//        private String userTags; // Теги, введенные пользователем
-//        private String preview;
-//
-//        public SaveFileTask(Runnable onSuccessCallback, String userTags, String preview) {
-//            this.onSuccessCallback = onSuccessCallback;
-//            this.userTags = userTags;
-//            this.preview = preview;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            try {
-//                String newFileName = params[0];
-//
-//                if (!newFileName.toLowerCase().endsWith(".docx")) {
-//                    newFileName += ".docx";
-//                }
-//
-//                File originalFile = new File(filePath);
-//                File newFile = new File(originalFile.getParent(), newFileName);
-//
-//                if (!newFile.getAbsolutePath().equals(originalFile.getAbsolutePath())) {
-//                    if (newFile.exists()) {
-//                        int counter = 1;
-//                        String baseName = newFileName.replace(".docx", "");
-//                        while (newFile.exists()) {
-//                            newFileName = baseName + " (" + counter + ").docx";
-//                            newFile = new File(originalFile.getParent(), newFileName);
-//                            counter++;
-//                        }
-//                    }
-//
-//                    if (!isNewFile && originalFile.exists()) {
-//                        originalFile.delete();
-//                    }
-//                }
-//
-//                filePath = newFile.getAbsolutePath();
-//
-//                // Сохраняем документ
-//                List<ContentBlock> blocks = blockManager.getBlocks();
-//                DocxBlockExporter.exportToDocx(blocks, filePath);
-//
-//                long currentTime = System.currentTimeMillis();
-//                long createdAt = isNewFile ? currentTime : databaseHelper.getDocumentCreatedAt(filePath);
-//
-//                // Создаем объект документа
-//                DocxFile doc = new DocxFile(newFileName, preview, filePath, currentTime, userTags, createdAt);
-//
-//                if (isNewFile) {
-//                    // Добавляем новый документ с автотегами
-//                    databaseHelper.addDocumentWithAutoTags(doc, createdAt, currentTime);
-//                    Log.d("SaveDebug", "✅ Новый файл добавлен с автотегами");
-//                } else {
-//                    // Обновляем существующий документ с автотегами
-//                    databaseHelper.updateDocumentWithAutoTags(filePath, newFileName, preview, createdAt, currentTime);
-//                    Log.d("SaveDebug", "✅ Существующий файл обновлен с автотегами");
-//                }
-//
-//                return true;
-//
-//            } catch (Exception e) {
-//                Log.e("SaveDebug", "❌ Ошибка сохранения: " + e.getMessage(), e);
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean success) {
-//            if (success) {
-//                isContentChanged = false;
-//                isNewFile = false;
-//                originalFileName = new File(filePath).getName();
-//
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Файл сохранен", Toast.LENGTH_SHORT).show();
-//
-//                if (onSuccessCallback != null) {
-//                    onSuccessCallback.run();
-//                }
-//            } else {
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Ошибка при сохранении", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
-//    private class SaveFileTask extends AsyncTask<String, Void, Boolean> {
-//        private Runnable onSuccessCallback;
-//        private String userTags;
-//        private String preview;
-//
-//        public SaveFileTask(Runnable onSuccessCallback, String userTags, String preview) {
-//            this.onSuccessCallback = onSuccessCallback;
-//            this.userTags = userTags;
-//            this.preview = preview;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            try {
-//                String newFileName = params[0];
-//
-//                if (!newFileName.toLowerCase().endsWith(".docx")) {
-//                    newFileName += ".docx";
-//                }
-//
-//                File originalFile = new File(filePath);
-//                File newFile = new File(originalFile.getParent(), newFileName);
-//
-//                // Если имя файла изменилось
-//                if (!newFile.getAbsolutePath().equals(originalFile.getAbsolutePath())) {
-//                    if (newFile.exists()) {
-//                        int counter = 1;
-//                        String baseName = newFileName.replace(".docx", "");
-//                        while (newFile.exists()) {
-//                            newFileName = baseName + " (" + counter + ").docx";
-//                            newFile = new File(originalFile.getParent(), newFileName);
-//                            counter++;
-//                        }
-//                    }
-//
-//                    // Удаляем старый файл, если это не новый файл
-//                    if (!isNewFile && originalFile.exists()) {
-//                        originalFile.delete();
-//                    }
-//                }
-//
-//                filePath = newFile.getAbsolutePath();
-//
-//                // Сохраняем содержимое документа
-//                List<ContentBlock> blocks = blockManager.getBlocks();
-//                DocxBlockExporter.exportToDocx(blocks, filePath);
-//
-//                long currentTime = System.currentTimeMillis();
-//
-//                if (isNewFile) {
-//                    // Получаем дату создания (для нового файла это текущее время)
-//                    long createdAt = currentTime;
-//
-//                    // Создаем объект документа
-//                    DocxFile doc = new DocxFile(newFileName, preview, filePath, currentTime, userTags, createdAt);
-//
-//                    // Добавляем новый документ
-//                    long result = databaseHelper.addDocumentWithAutoTags(doc, createdAt, currentTime);
-//                    if (result != -1) {
-//                        Log.d("SaveDebug", "✅ Новый файл добавлен с автотегами");
-//                        return true;
-//                    } else {
-//                        Log.e("SaveDebug", "❌ Ошибка добавления нового файла");
-//                        return false;
-//                    }
-//                } else {
-//                    // Для существующего файла получаем дату создания из БД
-//                    long createdAt = databaseHelper.getDocumentCreatedAt(filePath);
-//                    if (createdAt == 0) {
-//                        // Если не нашли, используем текущее время
-//                        createdAt = currentTime;
-//                    }
-//
-//                    // Обновляем существующий документ
-//                    int result = databaseHelper.updateDocumentWithAutoTags(filePath,
-//                            newFileName, preview, createdAt, currentTime);
-//                    if (result > 0) {
-//                        Log.d("SaveDebug", "✅ Существующий файл обновлен с автотегами");
-//                        return true;
-//                    } else {
-//                        Log.e("SaveDebug", "❌ Ошибка обновления файла");
-//                        return false;
-//                    }
-//                }
-//
-//            } catch (Exception e) {
-//                Log.e("SaveDebug", "❌ Ошибка сохранения: " + e.getMessage(), e);
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean success) {
-//            if (success) {
-//                isContentChanged = false;
-//                isNewFile = false;
-//                originalFileName = new File(filePath).getName();
-//
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Файл сохранен", Toast.LENGTH_SHORT).show();
-//
-//                if (onSuccessCallback != null) {
-//                    onSuccessCallback.run();
-//                }
-//            } else {
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Ошибка при сохранении", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
-    // Обновленная версия SaveFileTask - используем старые методы для надежности
-//    private class SaveFileTask extends AsyncTask<String, Void, Boolean> {
-//        private Runnable onSuccessCallback;
-//        private String userTags;
-//        private String preview;
-//
-//        public SaveFileTask(Runnable onSuccessCallback, String userTags, String preview) {
-//            this.onSuccessCallback = onSuccessCallback;
-//            this.userTags = userTags;
-//            this.preview = preview;
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            try {
-//                String newFileName = params[0];
-//
-//                if (!newFileName.toLowerCase().endsWith(".docx")) {
-//                    newFileName += ".docx";
-//                }
-//
-//                File originalFile = new File(filePath);
-//                File newFile = new File(originalFile.getParent(), newFileName);
-//
-//                // Если имя файла изменилось
-//                if (!newFile.getAbsolutePath().equals(originalFile.getAbsolutePath())) {
-//                    if (newFile.exists()) {
-//                        int counter = 1;
-//                        String baseName = newFileName.replace(".docx", "");
-//                        while (newFile.exists()) {
-//                            newFileName = baseName + " (" + counter + ").docx";
-//                            newFile = new File(originalFile.getParent(), newFileName);
-//                            counter++;
-//                        }
-//                    }
-//
-//                    // Удаляем старый файл, если это не новый файл
-//                    if (!isNewFile && originalFile.exists()) {
-//                        originalFile.delete();
-//                    }
-//                }
-//
-//                filePath = newFile.getAbsolutePath();
-//
-//                // Сохраняем содержимое документа
-//                List<ContentBlock> blocks = blockManager.getBlocks();
-//                DocxBlockExporter.exportToDocx(blocks, filePath);
-//
-//
-//                long currentTime = System.currentTimeMillis();
-//                Log.d("SaveDebug", "📝 Сохранение документа:");
-//                Log.d("SaveDebug", "  isNewFile: " + isNewFile);
-//                Log.d("SaveDebug", "  filePath: " + filePath);
-//                Log.d("SaveDebug", "  newFileName: " + newFileName);
-//                Log.d("SaveDebug", "  preview: " + (preview != null ? "'" + preview + "'" : "null"));
-//                Log.d("SaveDebug", "  userTags: " + (userTags != null ? "'" + userTags + "'" : "null"));
-//                Log.d("SaveDebug", "  currentTime: " + currentTime);
-//
-//                if (isNewFile) {
-//                    // Для нового файла: сначала добавляем через старый метод
-//                    DocxFile doc = new DocxFile(newFileName, preview, filePath, currentTime);
-//                    long result = databaseHelper.addDocument(doc);
-//
-//                    if (result != -1) {
-//                        // Затем добавляем автотеги
-//                        long createdAt = currentTime;
-//                        databaseHelper.addDocumentWithAutoTags(doc, createdAt, currentTime);
-//                        Log.d("SaveDebug", "✅ Новый файл добавлен");
-//                        return true;
-//                    } else {
-//                        Log.e("SaveDebug", "❌ Ошибка добавления нового файла");
-//                        return false;
-//                    }
-//                } else {
-//                    // Для существующего файла: сначала обновляем через старый метод
-//                    int result = databaseHelper.updateDocument(filePath, newFileName, preview);
-//
-//                    if (result > 0) {
-//                        // Затем добавляем автотеги
-//                        long createdAt = databaseHelper.getDocumentCreatedAt(filePath);
-//                        if (createdAt == 0) {
-//                            createdAt = currentTime;
-//                        }
-//
-//                        // Обновляем теги с автотегами
-//                        databaseHelper.updateDocumentWithAutoTags(filePath,
-//                                newFileName, preview, createdAt, currentTime);
-//                        Log.d("SaveDebug", "✅ Существующий файл обновлен");
-//                        return true;
-//                    } else {
-//                        Log.e("SaveDebug", "❌ Ошибка обновления файла");
-//                        return false;
-//                    }
-//                }
-//
-//            } catch (Exception e) {
-//                Log.e("SaveDebug", "❌ Ошибка сохранения: " + e.getMessage(), e);
-//                return false;
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean success) {
-//            if (success) {
-//                isContentChanged = false;
-//                isNewFile = false;
-//                originalFileName = new File(filePath).getName();
-//
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Файл сохранен", Toast.LENGTH_SHORT).show();
-//
-//                if (onSuccessCallback != null) {
-//                    onSuccessCallback.run();
-//                }
-//            } else {
-//                Toast.makeText(TextEditorActivity.this,
-//                        "Ошибка при сохранении", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
     private class SaveFileTask extends AsyncTask<String, Void, Boolean> {
         private Runnable onSuccessCallback;
         private String userTags;
@@ -2330,50 +1781,6 @@ private String generateFileNameFromContent(String content, int maxLength) {
         }
     }
 
-//    private void autoSave() {
-//        Log.d("AutoSave", "=== АВТОСОХРАНЕНИЕ ===");
-//        Log.d("AutoSave", "isContentChanged: " + isContentChanged + ", isNewFile: " + isNewFile);
-//
-//        if ((isContentChanged || isNewFile) && titleEditText != null) {
-//            String newFileName = titleEditText.getText().toString().trim();
-//
-//            // Если имя файла пустое, генерируем из содержимого
-//            if (newFileName.isEmpty()) {
-//                String contentPreview = blockManager.getContentPreview();
-//                if (!contentPreview.isEmpty()) {
-//                    newFileName = generateFileNameFromContent(contentPreview, 25);
-//                    Log.d("AutoSave", "🔤 Сгенерировано автоназвание: " + newFileName);
-//                } else {
-//                    Log.d("AutoSave", "❌ Нечего сохранять - пустой документ без названия");
-//                    return;
-//                }
-//            }
-//
-//            Log.d("AutoSave", "💾 Начинаем автосохранение: " + newFileName);
-//            blockManager.updateAllBlocksFromViews();
-//
-//            // Получаем теги и запускаем сохранение
-//            // ПОЛУЧАЕМ ПРЕВЬЮ ИЗ БЛОК-МЕНЕДЖЕРА
-//            String preview = blockManager.getContentPreview();
-//            String currentTags = tagEditText.getTagsForStorage();
-//
-//            new SaveFileTask(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (!isNewFile) {
-//                        originalTitle = titleEditText.getText().toString().trim();
-//                        originalTags = currentTags;
-//                        saveOriginalBlocksState();
-//                        isContentChanged = false;
-//                        updateActivityTitle();
-//                    }
-//                    finish();
-//                }
-//            }, currentTags, preview).execute(newFileName); // ПЕРЕДАЕМ ПРЕВЬЮ
-//        } else {
-//            Log.d("AutoSave", "⏭️ Автосохранение пропущено - нет изменений");
-//        }
-//    }
 
     private void autoSave() {
         Log.d("AutoSave", "=== АВТОСОХРАНЕНИЕ ===");
@@ -2423,7 +1830,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
         }
     }
 
-    // ДОБАВЛЯЕМ: сохранение исходного состояния блоков
+    // Сохранение исходного состояния блоков
     private void saveOriginalBlocksState() {
         originalBlocks.clear();
         List<ContentBlock> currentBlocks = blockManager.getBlocks();
@@ -2448,7 +1855,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
 
                 originalBlocks.add(original);
             } else if (block instanceof TableBlock) {
-                // ДОБАВЛЯЕМ: сохранение табличных блоков
+                // Сохранение табличных блоков
                 TableBlock tableBlock = (TableBlock) block;
                 TableBlock originalTable = new TableBlock(tableBlock.getRows(), tableBlock.getCols());
 
@@ -2500,7 +1907,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
 
         Log.d("ChangeDebug", "✅ Количество блоков не изменилось");
 
-        // ВАЖНО: Сначала обновляем данные из View
+        // Сначала обновляем данные из View
         blockManager.updateAllBlocksFromViews();
 
         // Проверяем изменения в каждом блоке
@@ -2611,18 +2018,18 @@ private String generateFileNameFromContent(String content, int maxLength) {
         // Не используется в этом контексте
     }
 
-    private void safeBlockOperation(Runnable operation) {
-        // Сохраняем состояние перед операцией
-        blockManager.saveAllBlockStates();
+//    private void safeBlockOperation(Runnable operation) {
+//        // Сохраняем состояние перед операцией
+//        blockManager.saveAllBlockStates();
+//
+//        // Выполняем операцию
+//        operation.run();
+//
+//        // Восстанавливаем состояние после операции
+//        blockManager.restoreAllBlockStates();
+//    }
 
-        // Выполняем операцию
-        operation.run();
-
-        // Восстанавливаем состояние после операции
-        blockManager.restoreAllBlockStates();
-    }
-
-    // ДОБАВЛЯЕМ: метод для инициализации диалога списков
+    // Метод для инициализации диалога списков
     private void initListDialog() {
         listDialog = new Dialog(this);
         listDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -2684,7 +2091,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
         });
     }
 
-    // ДОБАВЛЯЕМ: метод для показа диалога списков
+    // Метод для показа диалога списков
     private void showListDialog() {
         Log.d("ListDebug", "=== ПОКАЗ ДИАЛОГА СПИСКОВ ===");
         if (focusedBlockId != null && focusedEditText != null) {
@@ -3038,7 +2445,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для обновления TextBlock из EditText
+    // Метод для обновления TextBlock из EditText
     private void updateTextBlockFromEditText() {
         if (focusedBlockId != null && focusedEditText != null) {
             ContentBlock block = blockManager.getBlockById(focusedBlockId);
