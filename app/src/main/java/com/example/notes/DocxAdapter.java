@@ -1,20 +1,14 @@
 package com.example.notes;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.apache.poi.sl.draw.geom.Context;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,12 +44,12 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DocxFile file = fileList.get(position);
 
-        // обрезаем название здесь
+        // обрезание названия и превью
         String displayName = truncateFileName(file.getFileName(), 20);
         holder.fileName.setText(displayName);
         holder.filePreview.setText(file.getPreviewText());
 
-        // Обновляем внешний вид
+        // Обновление внешнего вида
         updateCardAppearance(holder, file);
         setupEventHandlers(holder, file);
     }
@@ -89,7 +83,7 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
     }
 
     private void setupEventHandlers(ViewHolder holder, DocxFile file) {
-        // Очищаем все предыдущие обработчики
+        // Очистка все предыдущих обработчики
         holder.noteButton.setOnClickListener(null);
         holder.noteButton.setOnLongClickListener(null);
 
@@ -102,7 +96,7 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
                 }
             });
         } else {
-            // Обычный режим - клик открывает, долгое нажатие начинает выделение
+            // Клик открывает, долгое нажатие начинает выделение
             holder.noteButton.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onItemClick(file);
@@ -167,11 +161,6 @@ public class DocxAdapter extends RecyclerView.Adapter<DocxAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-//    public void clearAndUpdateList(List<DocxFile> newList) {
-//        fileList.clear();
-//        fileList.addAll(newList);
-//        notifyDataSetChanged();
-//    }
     public interface OnItemClickListener {
         void onItemClick(DocxFile file);
 

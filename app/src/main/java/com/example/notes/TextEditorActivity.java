@@ -1,7 +1,6 @@
 package com.example.notes;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,26 +8,20 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.IBinder;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.AbsoluteSizeSpan;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,9 +36,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -56,7 +47,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class TextEditorActivity extends AppCompatActivity implements DocxAdapter.OnItemClickListener, BlockFocusListener, TableBlock.OnTableDeleteListener {
     private EditText titleEditText;
@@ -369,17 +359,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         Log.d("FontSizeDebug", "Используем размер по умолчанию: 16");
         return 16;
     }
-
-//    private int spToPx(float sp) {
-//        return (int) (sp * getResources().getDisplayMetrics().scaledDensity);
-//    }
-//
-//    private int pxToSp(float px) {
-//        float scaledDensity = getResources().getDisplayMetrics().scaledDensity;
-//        int sp = (int) (px / scaledDensity);
-//        Log.d("FontSizeDebug", "Конвертация px to sp: " + px + "px -> " + sp + "sp");
-//        return sp;
-//    }
 
     private void adjustFontSize(int delta) {
         Log.d("FontSizeDebug", "adjustFontSize вызван: delta=" + delta + ", currentFontSize=" + currentFontSize);
@@ -1055,7 +1034,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для отметки изменений
+    // Метод для отметки изменений
     private void markContentChanged() {
         // Проверяем, что загрузка завершена
         if (!isNewFile && !isInitialLoadComplete) {
@@ -1282,20 +1261,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     }
 
 
-    private static class BlockState {
-        String id;
-        String content;
-        boolean isHtml;
-
-        BlockState(String id, String content, boolean isHtml) {
-            this.id = id;
-            this.content = content;
-            this.isHtml = isHtml;
-        }
-    }
-
-    private List<BlockState> originalBlockStates = new ArrayList<>();
-
     private View findViewInGroup(ViewGroup group, String blockId) {
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
@@ -1392,43 +1357,43 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         hideKeyboard();
     }
 
-private String generateFileNameFromContent(String content, int maxLength) {
-    if (content == null || content.trim().isEmpty() || content.equals("Пустой документ")) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
-        return "Заметка " + sdf.format(new Date());
+    private String generateFileNameFromContent(String content, int maxLength) {
+        if (content == null || content.trim().isEmpty() || content.equals("Пустой документ")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
+            return "Заметка " + sdf.format(new Date());
+        }
+
+        String cleaned = content.trim()
+                .replaceAll("\\s+", " ")
+                .replaceAll("\\n+", " ")
+                .replaceAll("[\\\\/:*?\"<>|]", "")
+                .replaceAll("^[\\s\\p{Punct}]+", "")
+                .replaceAll("[\\s\\p{Punct}]+$", "")
+                .trim();
+
+        if (cleaned.isEmpty()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
+            return "Заметка " + sdf.format(new Date());
+        }
+
+        if (cleaned.length() <= maxLength) {
+            return cleaned;
+        }
+
+        String truncated = cleaned.substring(0, maxLength);
+        int lastSpace = truncated.lastIndexOf(' ');
+        int lastPunctuation = Math.max(
+                truncated.lastIndexOf('.'),
+                Math.max(truncated.lastIndexOf('!'), truncated.lastIndexOf('?'))
+        );
+
+        int cutIndex = Math.max(lastSpace, lastPunctuation);
+        if (cutIndex > maxLength / 2) {
+            return truncated.substring(0, cutIndex).trim();
+        }
+
+        return truncated.trim() + "...";
     }
-
-    String cleaned = content.trim()
-            .replaceAll("\\s+", " ")
-            .replaceAll("\\n+", " ")
-            .replaceAll("[\\\\/:*?\"<>|]", "")
-            .replaceAll("^[\\s\\p{Punct}]+", "")
-            .replaceAll("[\\s\\p{Punct}]+$", "")
-            .trim();
-
-    if (cleaned.isEmpty()) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
-        return "Заметка " + sdf.format(new Date());
-    }
-
-    if (cleaned.length() <= maxLength) {
-        return cleaned;
-    }
-
-    String truncated = cleaned.substring(0, maxLength);
-    int lastSpace = truncated.lastIndexOf(' ');
-    int lastPunctuation = Math.max(
-            truncated.lastIndexOf('.'),
-            Math.max(truncated.lastIndexOf('!'), truncated.lastIndexOf('?'))
-    );
-
-    int cutIndex = Math.max(lastSpace, lastPunctuation);
-    if (cutIndex > maxLength / 2) {
-        return truncated.substring(0, cutIndex).trim();
-    }
-
-    return truncated.trim() + "...";
-}
 
     private void updateActivityTitle() {
         String title = originalFileName.replace(".docx", "");
@@ -1994,7 +1959,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
         return false;
     }
 
-    // ДОБАВЛЯЕМ: безопасное сравнение строк
+    // Безопасное сравнение строк
     private boolean safeEquals(String str1, String str2) {
         if (str1 == null && str2 == null) return true;
         if (str1 == null) return str2.isEmpty();
@@ -2002,7 +1967,7 @@ private String generateFileNameFromContent(String content, int maxLength) {
         return str1.equals(str2);
     }
 
-    // ДОБАВЛЯЕМ: методы интерфейса DocxAdapter.OnItemClickListener
+    // Методы интерфейса DocxAdapter.OnItemClickListener
     @Override
     public void onItemClick(DocxFile file) {
         // Не используется в этом контексте, но требуется интерфейсом
@@ -2018,16 +1983,6 @@ private String generateFileNameFromContent(String content, int maxLength) {
         // Не используется в этом контексте
     }
 
-//    private void safeBlockOperation(Runnable operation) {
-//        // Сохраняем состояние перед операцией
-//        blockManager.saveAllBlockStates();
-//
-//        // Выполняем операцию
-//        operation.run();
-//
-//        // Восстанавливаем состояние после операции
-//        blockManager.restoreAllBlockStates();
-//    }
 
     // Метод для инициализации диалога списков
     private void initListDialog() {

@@ -1,10 +1,7 @@
 package com.example.notes;
 
-import static com.google.android.material.internal.ViewUtils.hideKeyboard;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -21,14 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -40,7 +34,6 @@ import org.apache.poi.xwpf.usermodel.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +41,6 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements DocxAdapter.OnItemClickListener {
     private RecyclerView recyclerView;// создание переменной recyclerView переменной типа RecyclerView
     private DocxAdapter adapter; // создание переменной adapter типа DocxAdapter
-    //private LinearLayoutManager layoutManager;
     private GridLayoutManager layoutManager;
     private List<DocxFile> fileList = new ArrayList<>();
     private CardView deleteButton;
@@ -96,25 +88,21 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
 
         // Инициализация базы данных
         databaseHelper = new DatabaseHelper(this);
-        //syncFilesWithDatabase();
 
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 // Ваша логика при нажатии "назад"
                 if (adapter.isSelectionMode()) {
-                    // Пример: выход из режима выделения
                     adapter.clearSelection();
                     hideDeleteButton();
                 } else {
-                    // Если callback включен (isEnabled=true),
-                    // вызов этого метода завершает Activity по умолчанию
                     this.setEnabled(false);
                     getOnBackPressedDispatcher().onBackPressed();
                 }
             }
         };
-        // Регистрируем callback у диспетчера
+        // Регистрация callback у диспетчера
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 
         // Инициализация кнопки удаления
@@ -133,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         recyclerView.setLayoutManager(layoutManager);
 
 
-        // Передаем this как слушатель кликов
+        // Передача this как слушатель кликов
         adapter = new DocxAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
@@ -201,26 +189,18 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
                 showTagsDropdown();
             });
         }
-        // Инициализация ProgressBar
-//        progressBar = findViewById(R.id.progressBar);
-//        if (progressBar != null) {
-//            progressBar.setVisibility(View.GONE);
-//        }
 
-        // Настраиваем бесконечный скролл
+        // Настройка бесконечного скролла
         setupInfiniteScroll();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Обновляем данные
+                // Обновление данных
                 loadFirstPage();
             }
         });
-        // Первоначальная загрузка
-        //loadFirstPage();
-
     }// конец oncreate---------------------------------------------------------------------------------------------------------------
 
 
@@ -237,21 +217,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         }
     }
 
-    //    private void loadAllTags() {
-//        new AsyncTask<Void, Void, List<String>>() {
-//            @Override
-//            protected List<String> doInBackground(Void... voids) {
-//                return databaseHelper.getAllUniqueTags();
-//            }
-//
-//            @Override
-//            protected void onPostExecute(List<String> tags) {
-//                allTags.clear();
-//                allTags.addAll(tags);
-//                Log.d("Tags", "Загружено тегов: " + allTags.size());
-//            }
-//        }.execute();
-//    }
+    @SuppressLint("StaticFieldLeak")
     private void loadAllTags() {
         new AsyncTask<Void, Void, List<String>>() {
             @Override
@@ -272,49 +238,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             }
         }.execute();
     }
-
-//    @SuppressLint("ClickableViewAccessibility")
-//    private void showTagsDropdown() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Выберите теги для фильтрации");
-//
-//        // Создаем массив для отображения тегов с #
-//        String[] displayTags = new String[allTags.size()];
-//        for (int i = 0; i < allTags.size(); i++) {
-//            displayTags[i] = "#" + allTags.get(i);
-//        }
-//
-//        // Массив для отслеживания выбранных тегов
-//        boolean[] checkedTags = new boolean[allTags.size()];
-//        for (int i = 0; i < allTags.size(); i++) {
-//            checkedTags[i] = selectedTags.contains(allTags.get(i));
-//        }
-//
-//        builder.setMultiChoiceItems(displayTags, checkedTags, (dialog, which, isChecked) -> {
-//            String tag = allTags.get(which);
-//            if (isChecked) {
-//                selectedTags.add(tag);
-//            } else {
-//                selectedTags.remove(tag);
-//            }
-//        });
-//
-//        builder.setPositiveButton("Применить", (dialog, which) -> {
-//            applyTagFilter();
-//            updateFilterIndicator();
-//        });
-//
-//        builder.setNegativeButton("Сбросить", (dialog, which) -> {
-//            selectedTags.clear();
-//            loadFiles(); // Показать все файлы
-//            Toast.makeText(MainActivity.this, "Фильтр сброшен", Toast.LENGTH_SHORT).show();
-//        });
-//
-//        builder.setNeutralButton("Отмена", null);
-//
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//    }
 
     private void showTagsDropdown() {
         final Dialog dialog = new Dialog(this);
@@ -338,23 +261,23 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         RecyclerView tagsRecyclerView = dialog.findViewById(R.id.searchByTagsRecyclerView);
         TextView resetButton = dialog.findViewById(R.id.resetSearchButtonText);
 
-        // Настраиваем RecyclerView
+        // Настройка RecyclerView
         SearchByTagAdapter tagAdapter = new SearchByTagAdapter(allTags, new SearchByTagAdapter.OnTagClickListener() {
             @Override
             public void onTagClick(String tag) {
                 if (tag != null) {
-                    // Выбран тег - применяем фильтр и закрываем диалог
+                    // Выбран тег - применение фильтра и закрытие диалога
                     onTagSelected(tag);
                     dialog.dismiss();
                 } else {
-                    // Тег снят - сбрасываем фильтр
+                    // Тег снят - сброс фильтра
                     onTagSelected(null);
                     dialog.dismiss();
                 }
             }
         });
 
-        // Если уже есть активный фильтр, показываем его в адаптере
+        // Если уже есть активный фильтр - показать его в адаптере
         if (currentFilterTag != null) {
             tagAdapter.setSelectedTag(currentFilterTag);
         }
@@ -373,179 +296,15 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
 
         dialog.show();
     }
-//    private void showTagsDropdown() {
-//        // Создаем кастомный диалог
-//        final Dialog dialog = new Dialog(this);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.custom_search_by_tags_view);
-//
-//        // ВАЖНО: разрешаем закрытие при клике вне диалога
-//        dialog.setCanceledOnTouchOutside(true);
-//        dialog.setCancelable(true);
-//
-//        // Настраиваем размер и положение диалога
-//        Window window = dialog.getWindow();
-//        if (window != null) {
-//            WindowManager.LayoutParams params = window.getAttributes();
-//            params.gravity = Gravity.CENTER;
-//            params.width = WindowManager.LayoutParams.WRAP_CONTENT;
-//            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-//
-//            // ДОБАВЛЯЕМ: прозрачный фон для области вокруг диалога
-//            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//
-//            // ДОБАВЛЯЕМ: затемнение фона
-//            window.setDimAmount(0.6f);
-//
-//            window.setAttributes(params);
-//        }
-//
-//        // Находим элементы
-//        RecyclerView tagsRecyclerView = dialog.findViewById(R.id.searchByTagsRecyclerView);
-////        CardView cancelButton = dialog.findViewById(R.id.cancelSearchButtonView);
-//        TextView resetButton = dialog.findViewById(R.id.resetSearchButtonText);
-//
-//        // ДОБАВЛЯЕМ: обработчик закрытия диалога при клике на затемненную область
-//        View dialogContainer = dialog.findViewById(android.R.id.content);
-//        if (dialogContainer != null) {
-//            dialogContainer.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    // Проверяем, что клик был именно на затемненной области, а не на самом диалоге
-//                    if (v.getId() == android.R.id.content) {
-//                        dialog.dismiss();
-//                    }
-//                }
-//            });
-//        }
-//
-//        // Настраиваем RecyclerView
-//        SearchByTagAdapter tagAdapter = new SearchByTagAdapter(allTags, new SearchByTagAdapter.OnTagClickListener() {
-//            @Override
-//            public void onTagClick(String tag) {
-//                if (tag != null) {
-//                    // Выбран тег - применяем фильтр и закрываем диалог
-//                    selectedTags.clear();
-//                    selectedTags.add(tag);
-//                    applyTagFilter();
-//                    updateFilterIndicator();
-//                    dialog.dismiss();
-//                } else {
-//                    // Тег снят - сбрасываем фильтр
-//                    selectedTags.clear();
-//                    loadFiles();
-//                    updateFilterIndicator();
-//                }
-//            }
-//        });
-//
-//        // Если уже есть выбранный тег, устанавливаем его в адаптер
-//        if (!selectedTags.isEmpty()) {
-//            tagAdapter.setSelectedTag(selectedTags.iterator().next());
-//        }
-//
-//        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        tagsRecyclerView.setAdapter(tagAdapter);
-//
-//        // Обработчики кнопок
-////        cancelButton.setOnClickListener(v -> {
-////            dialog.dismiss();
-////        });
-//
-//        resetButton.setOnClickListener(v -> {
-//            // Сброс фильтра
-//            selectedTags.clear();
-//            loadFiles();
-//            updateFilterIndicator();
-//            //dialog.dismiss();
-//            tagAdapter.clearSelection();
-//            Toast.makeText(MainActivity.this, "Фильтр сброшен", Toast.LENGTH_SHORT).show();
-//        });
-//
-//        // ДОБАВЛЯЕМ: слушатель отмены диалога (например, при нажатии кнопки "Назад")
-//        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialogInterface) {
-//                // Ничего не делаем, просто закрываем
-//            }
-//        });
-//
-//        // Показываем диалог
-//        dialog.show();
-//    }
 
-//    private void applyTagFilter() {
-//        if (selectedTags.isEmpty()) {
-//            loadFiles(); // Если нет выбранных тегов, показать все
-//        } else {
-//            // Берем первый (и единственный) тег из selectedTags
-//            String selectedTag = selectedTags.iterator().next();
-//            List<DocxFile> filteredFiles = databaseHelper.searchByTags(new String[]{selectedTag});
-//            adapter.updateList(filteredFiles);
-//            Toast.makeText(this, "Найдено: " + filteredFiles.size() + " файлов с тегом #" + selectedTag,
-//                    Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
-    //    private void applyTagFilter() {
-//        if (selectedTags.isEmpty()) {
-//            // Включаем бесконечный скролл при показе всех документов
-//            recyclerView.addOnScrollListener(scrollListener);
-//            loadFirstPage();
-//        } else {
-//            // Отключаем бесконечный скролл при фильтрации
-//            recyclerView.removeOnScrollListener(scrollListener);
-//
-//            String selectedTag = selectedTags.iterator().next();
-//            List<DocxFile> filteredFiles = databaseHelper.searchByTags(new String[]{selectedTag});
-//
-//            // Показываем все отфильтрованные результаты сразу
-//            fileList.clear();
-//            fileList.addAll(filteredFiles);
-//            adapter.updateList(fileList);
-//
-//            // Обновляем empty state
-//            updateEmptyState();
-//
-//            Toast.makeText(this, "Найдено: " + filteredFiles.size() + " файлов с тегом #" + selectedTag,
-//                    Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//    private void applyTagFilter() {
-//        if (selectedTags.isEmpty()) {
-//            // Включаем бесконечный скролл при показе всех документов
-//            recyclerView.addOnScrollListener(scrollListener);
-//            loadFirstPage();
-//        } else {
-//            // Отключаем бесконечный скролл при фильтрации
-//            recyclerView.removeOnScrollListener(scrollListener);
-//
-//            String selectedTag = selectedTags.iterator().next();
-//            List<DocxFile> filteredFiles = databaseHelper.searchByTags(new String[]{selectedTag});
-//
-//            // Показываем все отфильтрованные результаты сразу
-//            fileList.clear();
-//            fileList.addAll(filteredFiles);
-//            adapter.updateList(fileList);
-//
-//            // Обновляем empty state
-//            updateEmptyState();
-//
-//            // Обновляем индикатор с названием тега
-//            updateFilterIndicator();
-//
-//            Toast.makeText(this, "Найдено: " + filteredFiles.size() + " файлов с тегом #" + selectedTag,
-//                    Toast.LENGTH_SHORT).show();
-//        }
-//    }
     private void applyTagFilter(String tag) {
         if (tag == null || tag.isEmpty()) {
-            // Показываем все документы
+            // Вывести все документы
             recyclerView.addOnScrollListener(scrollListener);
             loadFirstPage();
             currentFilterTag = null;
         } else {
-            // Фильтруем по тегу
+            // Фильтр по тегу
             recyclerView.removeOnScrollListener(scrollListener);
 
             List<DocxFile> filteredFiles = databaseHelper.searchByTags(new String[]{tag});
@@ -557,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             updateEmptyState();
             currentFilterTag = tag;
 
-            // Обновляем индикатор
+            // Обновление индикатора
             updateFilterIndicator();
 
             Toast.makeText(this, "Найдено: " + filteredFiles.size() + " файлов с тегом #" + tag,
@@ -576,16 +335,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             currentFilterTag = null;
             applyTagFilter(null);
         }
-    }
-
-    /**
-     * ОБНОВЛЯЕМ метод при сбросе фильтра
-     */
-    private void resetFilterAndEnableInfiniteScroll() {
-        selectedTags.clear();
-        // Включаем бесконечный скролл обратно
-        recyclerView.addOnScrollListener(scrollListener);
-        loadFirstPage();
     }
 
     private void showDeleteButton() {
@@ -648,51 +397,15 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         dialog.show();
     }
 
-    //    private void performFileDeletion(List<DocxFile> filesToDelete) {
-//        boolean allDeleted = true;
-//        int deletedCount = 0;
-//
-//        for (DocxFile file : filesToDelete) {
-//            File fileToDelete = new File(file.getFilePath());
-//
-//            // УДАЛЯЕМ ИЗ БАЗЫ ДАННЫХ В ЛЮБОМ СЛУЧАЕ
-//            databaseHelper.deleteDocument(file.getFilePath());
-//            deletedCount++;
-//
-//            // УДАЛЯЕМ ФАЙЛ ИЗ ФАЙЛОВОЙ СИСТЕМЫ (если существует)
-//            if (fileToDelete.exists() && !fileToDelete.delete()) {
-//                allDeleted = false;
-//                Log.e("FileDelete", "Не удалось удалить файл: " + file.getFilePath());
-//            } else {
-//                Log.d("FileDelete", "Файл удален: " + file.getFilePath());
-//            }
-//        }
-//
-//        // Обновляем список
-//        refreshFileList();
-//        hideDeleteButton();
-//
-//        String message;
-//        if (allDeleted) {
-//            message = "Удалено " + deletedCount + " файл(ов)";
-//        } else {
-//            message = "Удалено " + deletedCount + " записей, но некоторые файлы не найдены";
-//        }
-//
-//        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-//
-//        // ВЫЗЫВАЕМ ОЧИСТКУ ДЛЯ ПОДСТРАХОВКИ
-//        cleanupOrphanedDatabaseEntriesAsync();
-//    }
     private void performFileDeletion(List<DocxFile> filesToDelete) {
         boolean allDeleted = true;
         for (DocxFile file : filesToDelete) {
             File fileToDelete = new File(file.getFilePath());
 
-            // УДАЛЯЕМ ИЗ БАЗЫ ДАННЫХ В ЛЮБОМ СЛУЧАЕ
+            // Удаление из БД
             databaseHelper.deleteDocument(file.getFilePath());
 
-            // УДАЛЯЕМ ФАЙЛ ИЗ ФАЙЛОВОЙ СИСТЕМЫ (если существует)
+            // удаление из файловой системы
             if (fileToDelete.exists() && !fileToDelete.delete()) {
                 allDeleted = false;
                 Log.e("FileDelete", "Не удалось удалить файл: " + file.getFilePath());
@@ -701,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             }
         }
 
-        // ВАЖНО: СБРАСЫВАЕМ ВЫДЕЛЕНИЕ ПЕРЕД ОБНОВЛЕНИЕМ СПИСКА
+        // сброс выделения перед обновлением списка
         if (adapter != null) {
             adapter.clearSelection();
         }
@@ -725,9 +438,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         cleanupOrphanedDatabaseEntriesAsync();
     }
 
-    /**
-     * Асинхронная очистка устаревших записей в БД
-     */
+    // Асинхронная очистка устаревших записей в БД
     private void cleanupOrphanedDatabaseEntriesAsync() {
         new Thread(() -> {
             File directory = getDocumentsDirectory();
@@ -735,15 +446,13 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         }).start();
     }
 
-    /**
-     * Очистка устаревших записей в БД - ИСПРАВЛЕННАЯ ВЕРСИЯ
-     */
+    // Очистка устаревших записей в БД
     private void cleanupOrphanedDatabaseEntries(File directory) {
         try {
             List<DocxFile> dbFiles = databaseHelper.getAllDocuments();
             Set<String> fileSystemPaths = new HashSet<>();
 
-            // ПОЛУЧАЕМ ВСЕ ФАЙЛЫ .docx ИЗ ДИРЕКТОРИИ
+            // Получение всех файлов docx из директории
             File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".docx"));
             if (files != null) {
                 for (File file : files) {
@@ -755,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             int removedCount = 0;
             for (DocxFile dbFile : dbFiles) {
                 if (!fileSystemPaths.contains(dbFile.getFilePath())) {
-                    // УДАЛЯЕМ ИЗ БАЗЫ ДАННЫХ, ЕСЛИ ФАЙЛА НЕТ В ФАЙЛОВОЙ СИСТЕМЕ
+                    // удаление из БД если их нет в файловой системе
                     databaseHelper.deleteDocument(dbFile.getFilePath());
                     removedCount++;
                     Log.d("Cleanup", "Удален отсутствующий файл из БД: " + dbFile.getFilePath());
@@ -764,9 +473,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
 
             if (removedCount > 0) {
                 Log.d("Cleanup", "Очистка завершена. Удалено записей: " + removedCount);
-                //runOnUiThread(() ->
-                //        Toast.makeText(this, "Очистка БД: удалено " + removedCount + " записей", Toast.LENGTH_SHORT).show());
-            }
+                }
 
         } catch (Exception e) {
             Log.e("Cleanup", "Ошибка при очистке БД", e);
@@ -774,38 +481,14 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
     }
 
     private void createNewFile() {
-        // Запускаем TextEditorActivity без параметров для создания нового файла
+        // Запуск TextEditorActivity без параметров для создания нового файла
         Intent intent = new Intent(this, TextEditorActivity.class);
         startActivity(intent);
     }
 
-    //    private void loadFiles() {
-//        // Просто запускаем задачу загрузки из БД
-//        new LoadDocxFilesTask().execute();
-//    }
     private void loadFiles() {
         loadFirstPage();
     }
-
-//    // ДОБАВЛЯЕМ: очистка устаревших записей в БД
-//    private void cleanupOrphanedDatabaseEntries(File directory) {
-//        List<DocxFile> dbFiles = databaseHelper.getAllDocuments();
-//        Set<String> fileSystemPaths = new HashSet<>();
-//
-//        File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".docx"));
-//        if (files != null) {
-//            for (File file : files) {
-//                fileSystemPaths.add(file.getAbsolutePath());
-//            }
-//        }
-//
-//        for (DocxFile dbFile : dbFiles) {
-//            if (!fileSystemPaths.contains(dbFile.getFilePath())) {
-//                databaseHelper.deleteDocument(dbFile.getFilePath());
-//                Log.d("Sync", "Удален отсутствующий файл из БД: " + dbFile.getFilePath());
-//            }
-//        }
-//    }
 
     @Override
     public void onItemClick(DocxFile file) {
@@ -835,19 +518,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         startActivity(intent);
     }
 
-    //    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if (layoutManager != null) {
-//            layoutManager.scrollToPositionWithOffset(0, 0);
-//        }
-//        // ОБНОВЛЯЕМ список при возврате в активность
-//        refreshFileList();
-//        loadAllTags();
-//
-//        // ПЕРИОДИЧЕСКАЯ ОЧИСТКА БАЗЫ ДАННЫХ ПРИ ЗАПУСКЕ
-//        cleanupOrphanedDatabaseEntriesAsync();
-//    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -857,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             layoutManager.scrollToPositionWithOffset(0, 0);
         }
 
-        // Восстанавливаем фильтр, если он был
+        // Восстановление фильтра, если он был
         if (currentFilterTag != null && !currentFilterTag.isEmpty()) {
             Log.d("MainDebug", "Восстанавливаем фильтр: " + currentFilterTag);
             applyTagFilter(currentFilterTag);
@@ -873,21 +543,21 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
     }
 
 
-    // метод для установки цвета контента из списка конфигурации
+    // Метод для установки цвета контента из списка конфигурации
     private void setContentViewColor(View contentView, int color) {
         if (contentView instanceof TextView) {
             TextView textView = (TextView) contentView;
 
-            // Проверяем, есть ли текст
+            // Проверка - есть ли текст
             if (textView.getText().length() > 0) {
-                // Это текстовая кнопка - меняем цвет текста
+                // Если текстовая кнопка - изменение цвета текста
                 textView.setTextColor(color);
             } else {
-                // Это иконка - меняем цвет через ColorFilter
+                // Если иконка - изменение цвета через ColorFilter
                 Drawable background = textView.getBackground();
                 if (background != null) {
                     background.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-                    textView.invalidate(); // Важно: обновляем view
+                    textView.invalidate(); // обновление view
                 }
             }
         }
@@ -934,17 +604,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         });
     }
 
-    //    private void updateFilterIndicator() {
-//        TextView filterIndicator = findViewById(R.id.filterIndicator);
-//        if (filterIndicator != null) {
-//            if (selectedTags.isEmpty()) {
-//                filterIndicator.setVisibility(View.GONE);
-//            } else {
-//                filterIndicator.setVisibility(View.VISIBLE);
-//                filterIndicator.setText("Тегов: " + selectedTags.size());
-//            }
-//        }
-//    }
     private void updateFilterIndicator() {
         filterIndicator = findViewById(R.id.filterIndicator);
 
@@ -953,14 +612,14 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
                 filterIndicator.setVisibility(View.GONE);
             } else {
                 filterIndicator.setVisibility(View.VISIBLE);
-                // Получаем первый (и единственный) выбранный тег
+                // Получение первого (и единственного) выбранного тега
                 String selectedTag = selectedTags.iterator().next();
                 filterIndicator.setText("Срт. по: " + selectedTag);
             }
         }
     }
 
-    private void setupMultipleButtons(ButtonConfig[] configs) { // установака анимации для кнопок
+    private void setupMultipleButtons(ButtonConfig[] configs) { // установка анимации для кнопок
         for (ButtonConfig config : configs) {
             CardView cardView = findViewById(config.cardViewId);
             TextView textView = findViewById(config.textViewId);
@@ -982,12 +641,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
 
 
     @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        if (databaseHelper != null) {
-//            databaseHelper.close();
-//        }
-//    }
     protected void onDestroy() {
         super.onDestroy();
         // Убираем слушатель скролла при уничтожении активности
@@ -996,30 +649,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         }
     }
 
-//    private class LoadDocxFilesTask extends AsyncTask<Void, Void, List<DocxFile>> {
-//        @Override
-////        protected List<DocxFiles> doInBackground(Void... voids) {
-////            // ПРОСТО берем данные из БД
-////            return databaseHelper.getAllDocuments();
-////        }
-//        protected List<DocxFile> doInBackground(Void... voids) {
-//            // ПРОСТО берем данные из БД
-//            return databaseHelper.getAllDocuments();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List<DocxFile> files) {
-//            adapter.updateList(files);
-//            resetScrollToTop();
-//        }
-//    }
-
-    /**
-     * Обновленный AsyncTask для бесконечного скролла
-     */
-    /**
-     * Обновленный AsyncTask с обработкой empty state
-     */
     private class LoadDocxFilesTask extends AsyncTask<Void, Void, List<DocxFile>> {
         private int page;
         private boolean isLoadMore;
@@ -1034,9 +663,6 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
             super.onPreExecute();
             isLoading = true;
 
-//            if (isLoadMore && progressBar != null) {
-//                progressBar.setVisibility(View.VISIBLE);
-//            }
 
             // Скрываем empty state во время загрузки
             if (!isLoadMore && emptyStateView != null) {
@@ -1060,15 +686,11 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         protected void onPostExecute(List<DocxFile> files) {
             isLoading = false;
 
-            // Скрываем ProgressBar
-//            if (progressBar != null) {
-//                progressBar.setVisibility(View.GONE);
-//            }
             if (swipeRefreshLayout != null) {
                 swipeRefreshLayout.setRefreshing(false);
             }
 
-            // Проверяем, что активность еще существует
+            // Проверка: что активность еще существует
             if (isFinishing() || isDestroyed()) {
                 return;
             }
@@ -1083,7 +705,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
                     adapter.updateList(fileList);
                 }
             } else {
-                // Заменяем список
+                // Замена списка
                 fileList.clear();
                 fileList.addAll(files);
 
@@ -1092,15 +714,15 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
                 }
             }
 
-            // Проверяем, есть ли еще данные
+            // Проверка: есть ли еще данные
             hasMore = databaseHelper.hasMoreDocuments(currentPage);
 
             Log.d("InfiniteScroll", "Загружено: " + fileList.size() + " документов, есть еще: " + hasMore);
 
-            // Обновляем состояние пустого списка
+            // Обновление состояния пустого списка
             updateEmptyState();
 
-            // Прокручиваем к началу только при первой загрузке
+            // Прокрутка к началу только при первой загрузке
             if (!isLoadMore) {
                 resetScrollToTop();
             }
@@ -1110,11 +732,11 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
     private void updateEmptyState() {
         if (emptyStateView != null && recyclerView != null) {
             if (fileList.isEmpty() && !isLoading) {
-                // Показываем empty state, скрываем recyclerView
+                // Показать empty state, скрыть recyclerView
                 emptyStateView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             } else {
-                // Скрываем empty state, показываем recyclerView
+                // Скрыть empty state, показать recyclerView
                 emptyStateView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
@@ -1123,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
 
     private void resetScrollToTop() {
         if (layoutManager != null) {
-            // Используем post для гарантии что прокрутка после рендера
+            // post для гарантии что прокрутка после рендера
             recyclerView.post(new Runnable() {
                 @Override
                 public void run() {
@@ -1145,9 +767,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         }
     }
 
-    /**
-     * Настройка бесконечного скролла
-     */
+    // Настройка бесконечного скролла
     private void setupInfiniteScroll() {
         scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -1157,9 +777,9 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
                 LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (layoutManager == null) return;
 
-                int visibleItemCount = layoutManager.getChildCount();
+                //int visibleItemCount = layoutManager.getChildCount();
                 int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                //int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
 
                 // Проверяем, достигли ли мы конца списка
@@ -1174,9 +794,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         recyclerView.addOnScrollListener(scrollListener);
     }
 
-    /**
-     * Загрузка первой страницы
-     */
+    // Загрузка первой страницы
     private void loadFirstPage() {
         currentPage = 0;
         hasMore = true;
@@ -1185,9 +803,7 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
         new LoadDocxFilesTask(0, false).execute();
     }
 
-    /**
-     * Загрузка следующей страницы
-     */
+    // Загрузка следующей страницы
     private void loadNextPage() {
         if (!isLoading && hasMore) {
             currentPage++;
@@ -1199,12 +815,12 @@ public class MainActivity extends AppCompatActivity implements DocxAdapter.OnIte
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // Сохраняем текущий тег фильтра
+        // Сохранение текущего тега фильтра
         if (currentFilterTag != null) {
             outState.putString("currentFilterTag", currentFilterTag);
         }
 
-        // Сохраняем страницу
+        // Сохранение страницы
         outState.putInt("currentPage", currentPage);
     }
 

@@ -1,18 +1,12 @@
 package com.example.notes;
 
-//import static com.google.android.material.internal.ViewUtils.dpToPx;
-
-import static androidx.core.util.TypedValueCompat.dpToPx;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +22,6 @@ import android.widget.Button;
 import android.util.Log;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 
 public class TableBlock extends ContentBlock {
@@ -36,7 +29,7 @@ public class TableBlock extends ContentBlock {
     private int cols;
     private String[][] data;
     private String caption;
-    private Context context; // ДОБАВЛЯЕМ: сохраняем контекст
+    private Context context;
 
     private OnTableDeleteListener onTableDeleteListener;
 
@@ -89,13 +82,13 @@ public class TableBlock extends ContentBlock {
 
     @Override
     public View createView(Context context) {
-        this.context = context; // Сохраняем контекст при создании View
+        this.context = context; // сохраняется контекст при создании View
         return createTableView(context);
     }
 
     @Override
     public void updateFromView(View view) {
-        // ТЕПЕРЬ VIEW - ЭТО CardView, НУЖНО НАЙТИ TableLayout ВНУТРИ НЕГО
+
         TableLayout tableLayout = findTableLayoutInCardView(view);
         if (tableLayout != null) {
             updateFromTableView(tableLayout);
@@ -104,7 +97,7 @@ public class TableBlock extends ContentBlock {
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для поиска TableLayout внутри CardView
+    // Метод для поиска TableLayout внутри CardView
     private TableLayout findTableLayoutInCardView(View cardView) {
         if (cardView instanceof CardView) {
             // CardView -> LinearLayout (первый дочерний элемент)
@@ -113,7 +106,7 @@ public class TableBlock extends ContentBlock {
                 View linearLayout = cardViewGroup.getChildAt(0);
                 if (linearLayout instanceof LinearLayout) {
                     LinearLayout linear = (LinearLayout) linearLayout;
-                    // Ищем HorizontalScrollView
+                    // Поиск HorizontalScrollView
                     for (int i = 0; i < linear.getChildCount(); i++) {
                         View child = linear.getChildAt(i);
                         if (child instanceof HorizontalScrollView) {
@@ -179,7 +172,7 @@ public class TableBlock extends ContentBlock {
         }
     }
 
-    // ДОБАВЛЯЕМ: ссылки на View из XML
+    // Ссылки на View из XML
     private EditText captionEditText;
     private TableLayout tableLayout;
     private TextView editTableButton;
@@ -188,17 +181,17 @@ public class TableBlock extends ContentBlock {
     public View createTableView(Context context) {
         this.context = context;
 
-        // ИСПОЛЬЗУЕМ LAYOUT INFLATER ДЛЯ ЗАГРУЗКИ XML
+        // C помощью LayoutInflater загружаются xml
         LayoutInflater inflater = LayoutInflater.from(context);
         View tableBlockView = inflater.inflate(R.layout.customtableblock, null);
 
-        // НАХОДИМ ЭЛЕМЕНТЫ ИЗ XML
+        // Поиск из элементов XML
         captionEditText = tableBlockView.findViewById(R.id.captionEditText);
         tableLayout = tableBlockView.findViewById(R.id.tableLayout);
         editTableButton = tableBlockView.findViewById(R.id.editTableButton);
         deleteTableButton = tableBlockView.findViewById(R.id.deleteTableButton);
 
-        // НАСТРАИВАЕМ ЭЛЕМЕНТЫ
+        // Настройка элементов
         if (captionEditText != null) {
             captionEditText.setText(caption != null ? caption : "Заголовок таблицы");
             captionEditText.addTextChangedListener(new TextWatcher() {
@@ -215,10 +208,10 @@ public class TableBlock extends ContentBlock {
             });
         }
 
-        // СОЗДАЕМ СТРУКТУРУ ТАБЛИЦЫ
+        // Создание структуры таблицы
         createTableStructure(tableLayout, context);
 
-        // НАСТРАИВАЕМ КНОПКУ РЕДАКТИРОВАНИЯ
+        // Настройка кнопки редактирования
         if (editTableButton != null) {
             editTableButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -228,6 +221,7 @@ public class TableBlock extends ContentBlock {
             });
         }
 
+        // Настройка кнопки удаления таблицы
         if (deleteTableButton != null) {
             deleteTableButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -240,7 +234,7 @@ public class TableBlock extends ContentBlock {
         return tableBlockView;
     }
 
-    // ДОБАВЛЯЕМ: метод для показа диалога подтверждения удаления
+    // Метод для показа диалога подтверждения удаления
     private void showDeleteConfirmationDialog() {
         if (context instanceof Activity) {
             Activity activity = (Activity) context;
@@ -282,7 +276,7 @@ public class TableBlock extends ContentBlock {
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для показа диалога редактирования
+    // Метод для показа диалога редактирования
     private void showTableEditDialog() {
         if (context instanceof TextEditorActivity) {
             ((TextEditorActivity) context).showTableEditDialog(this);
@@ -292,17 +286,17 @@ public class TableBlock extends ContentBlock {
     public void resizeTable(int newRows, int newCols) {
         if (newRows <= 0 || newCols <= 0) return;
 
-        // СОХРАНЯЕМ СТАРЫЕ ДАННЫЕ
+        // Сохранение старых данных
         String[][] newData = new String[newRows][newCols];
 
-        // КОПИРУЕМ СУЩЕСТВУЮЩИЕ ДАННЫЕ
+        // копирования существующих данных
         for (int i = 0; i < Math.min(rows, newRows); i++) {
             for (int j = 0; j < Math.min(cols, newCols); j++) {
                 newData[i][j] = data[i][j];
             }
         }
 
-        // ЗАПОЛНЯЕМ НОВЫЕ ЯЧЕЙКИ ПУСТЫМИ СТРОКАМИ
+        // заполнение ячеек пустыми строками
         for (int i = 0; i < newRows; i++) {
             for (int j = 0; j < newCols; j++) {
                 if (newData[i][j] == null) {
@@ -331,7 +325,7 @@ public class TableBlock extends ContentBlock {
                 params.weight = 1f;
                 cell.setLayoutParams(params);
 
-                // УСТАНАВЛИВАЕМ МИНИМАЛЬНУЮ ШИРИНУ НЕПОСРЕДСТВЕННО ДЛЯ View
+                // View установка минимальной ширины для view
                 cell.setMinimumWidth(minCellWidthPx);
 
                 cell.setBackgroundResource(R.drawable.cell_border);
@@ -363,13 +357,13 @@ public class TableBlock extends ContentBlock {
         }
     }
 
-    // метод для конвертации dp в пиксели
+    // Метод для конвертации dp в пиксели
     private int dpToPx(int dp) {
         if (context == null) return dp;
         return (int) (dp * context.getResources().getDisplayMetrics().density);
     }
 
-    // ИСПРАВЛЯЕМ: передаем контекст как параметр
+    // Передача контекста как параметр
     private EditText createCell(Context context, boolean isHeader) {
         EditText cell = new EditText(context);
         // Дополнительные настройки ячейки если нужно
@@ -388,7 +382,7 @@ public class TableBlock extends ContentBlock {
         }
     }
 
-    // ДОБАВЛЯЕМ: интерфейс для удаления таблицы
+    // Интерфейс для удаления таблицы
     public interface OnTableDeleteListener {
         void onTableDelete(TableBlock tableBlock);
     }

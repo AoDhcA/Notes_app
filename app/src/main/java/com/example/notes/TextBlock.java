@@ -1,11 +1,9 @@
 package com.example.notes;
 
-import android.os.Build;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.util.TypedValue;
@@ -15,12 +13,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +54,7 @@ public class TextBlock extends ContentBlock {
                 return;
             }
 
-            // Удаляем ВСЕ существующие SizeSpan в этом диапазоне
+            // Удаление всех существующих SizeSpan в этом диапазоне
             AbsoluteSizeSpan[] existingSpans = spannable.getSpans(start, end, AbsoluteSizeSpan.class);
             Log.d("TextBlock", "Удаляем существующие спаны в диапазоне " + start + "-" + end + ": " + existingSpans.length);
 
@@ -68,19 +62,19 @@ public class TextBlock extends ContentBlock {
                 int spanStart = spannable.getSpanStart(span);
                 int spanEnd = spannable.getSpanEnd(span);
 
-                // Удаляем спан только если он пересекается с нашим диапазоном
+                // Удаление спана только если он пересекается с нашим диапазоном
                 if (!(spanEnd <= start || spanStart >= end)) {
                     spannable.removeSpan(span);
                     Log.d("TextBlock", "Удален спан: " + spanStart + "-" + spanEnd + ", размер=" + span.getSize());
                 }
             }
 
-            // Применяем новый размер
+            // Применение новый размер
             AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(sizeSp, true);
             spannable.setSpan(sizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             Log.d("TextBlock", "Применен новый спан: " + start + "-" + end + ", размер=" + sizeSp);
 
-            // НЕМЕДЛЕННО обновляем HTML
+            // обновление HTML
             updateHtmlFromSpannable(spannable);
         } else {
             Log.e("TextBlock", "editText не доступен для применения размера");
@@ -126,7 +120,7 @@ public class TextBlock extends ContentBlock {
             // Текст до текущего спана (без форматирования)
             if (spanStart > currentPosition) {
                 String beforeText = fullText.substring(currentPosition, spanStart);
-                // Важно: сохраняем переносы строк как <br>
+                // Сохраняем переносы строк как <br>
                 htmlBuilder.append(convertNewlinesToBr(beforeText));
                 Log.d("TextBlock", "Текст до спана: '" + beforeText + "' -> '" + convertNewlinesToBr(beforeText) + "'");
             }
@@ -169,26 +163,6 @@ public class TextBlock extends ContentBlock {
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;")
                 .replace("\n", "<br>");
-    }
-
-    private String escapeHtmlWithLineBreaks(String text) {
-        if (text == null) return "";
-
-        // Сначала заменяем специальные символы HTML
-        String escaped = text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;");
-
-        // Сохраняем переносы строк - заменяем их на <br>
-        escaped = escaped.replace("\n", "<br>");
-
-        return escaped;
-    }
-
-    private String escapeHtmlPreservingLineBreaks(String text) {
-        return escapeHtmlWithLineBreaks(text);
     }
 
     @Override
@@ -246,14 +220,13 @@ public class TextBlock extends ContentBlock {
         }
     }
 
-    // ДОБАВЛЯЕМ: метод для проверки реального форматирования
+    // Метод для проверки реального форматирования
     protected boolean hasRealFormatting() {
         if (rawHtmlContent == null || rawHtmlContent.isEmpty()) {
             Log.d("TextBlock", "hasRealFormatting: false (null or empty)");
             return false;
         }
 
-        // ПРОСТАЯ И НАДЕЖНАЯ ПРОВЕРКА
         boolean hasFontTags = rawHtmlContent.contains("<font");
         Log.d("TextBlock", "hasRealFormatting: " + hasFontTags + " для: " + rawHtmlContent);
         return hasFontTags;
@@ -285,7 +258,7 @@ public class TextBlock extends ContentBlock {
         editText.setGravity(Gravity.TOP);
         editText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16); // базовый размер
 
-        // Слушатели фокуса...
+        // Слушатели фокуса:
         // Слушатель для отслеживания выделения текста
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -311,7 +284,7 @@ public class TextBlock extends ContentBlock {
         return editText;
     }
 
-    // ДОБАВЛЯЕМ: метод для уведомления о фокусе
+    // Метод для уведомления о фокусе
     private void notifyBlockFocused(EditText editText) {
         // Здесь мы будем использовать интерфейс обратного вызова
         // Пока просто логируем
@@ -329,22 +302,9 @@ public class TextBlock extends ContentBlock {
             this.text = editText.getText().toString();
             Log.d("TextBlock", "🔄 updateFromView: сохранен текст='" + this.text + "'");
 
-            // ⚠️ ЗАКОММЕНТИРУЕМ эту часть - она может портить HTML
-            // if (rawHtmlContent != null) {
-            //     this.rawHtmlContent = updateHtmlText(rawHtmlContent, this.text);
-            //     Log.d("TextBlock", "🔄 updateFromView: обновлен HTML='" + rawHtmlContent + "'");
-            // }
-
             // Вместо этого просто логируем состояние
             Log.d("TextBlock", "🔄 updateFromView: rawHtmlContent=" + rawHtmlContent);
         }
-    }
-
-    private String textToHtml(String text, int defaultSize) {
-        if (text == null || text.isEmpty()) {
-            return "<font size=\"" + defaultSize + "\"></font>";
-        }
-        return "<font size=\"" + defaultSize + "\">" + escapeHtml(text) + "</font>";
     }
 
     private String htmlToText(String html) {
@@ -352,17 +312,6 @@ public class TextBlock extends ContentBlock {
         // Заменяем <br> на переносы строк перед преобразованием
         String htmlWithLineBreaks = html.replace("<br>", "\n");
         return Html.fromHtml(htmlWithLineBreaks).toString();
-    }
-
-    private static String escapeHtml(String text) {
-        if (text == null) return "";
-
-        // Заменяем специальные символы HTML, но не трогаем <br>
-        return text.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;");
     }
 
     public SpannableString htmlToSpannable(String html) {
@@ -395,84 +344,6 @@ public class TextBlock extends ContentBlock {
         return new SpannableString(builder);
     }
 
-//    public SpannableString htmlToSpannable(String html) {
-//        if (html == null || html.isEmpty()) {
-//            return new SpannableString("");
-//        }
-//
-//        Log.d("TextBlock", "htmlToSpannable: входной HTML=" + html);
-//
-//        // Создаем SpannableStringBuilder для построения результата
-//        SpannableStringBuilder builder = new SpannableStringBuilder();
-//
-//        // Шаблон для поиска тегов <font>
-//        Pattern fontPattern = Pattern.compile("<font size=\"(\\d+)\">(.*?)</font>", Pattern.DOTALL);
-//        Matcher fontMatcher = fontPattern.matcher(html);
-//
-//        int lastEnd = 0;
-//
-//        while (fontMatcher.find()) {
-//            // Текст до тега <font>
-//            if (fontMatcher.start() > lastEnd) {
-//                String before = html.substring(lastEnd, fontMatcher.start());
-//                appendTextWithLineBreaks(builder, before, -1);
-//            }
-//
-//            // Обработка содержимого тега <font>
-//            int fontSize = Integer.parseInt(fontMatcher.group(1));
-//            String content = fontMatcher.group(2);
-//            appendTextWithLineBreaks(builder, content, fontSize);
-//
-//            lastEnd = fontMatcher.end();
-//        }
-//
-//        // Оставшийся текст после последнего тега
-//        if (lastEnd < html.length()) {
-//            String remaining = html.substring(lastEnd);
-//            appendTextWithLineBreaks(builder, remaining, -1);
-//        }
-//
-//        Log.d("TextBlock", "Итоговый spannable: '" + builder.toString() +
-//                "', длина=" + builder.length());
-//        return new SpannableString(builder);
-//    }
-
-
-//    private void appendTextWithLineBreaks(SpannableStringBuilder builder, String text, int fontSize) {
-//        if (text == null || text.isEmpty()) return;
-//
-//        // Разделяем текст по <br>
-//        String[] parts = text.split("<br>");
-//
-//        for (int i = 0; i < parts.length; i++) {
-//            String part = decodeHtmlEntities(parts[i]);
-//            if (!part.isEmpty()) {
-//                int start = builder.length();
-//                builder.append(part);
-//                int end = builder.length();
-//
-//                // Применяем размер шрифта, если указан
-//                if (fontSize != -1 && start < end) {
-//                    AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize, true);
-//                    builder.setSpan(sizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                }
-//            }
-//
-//            // Добавляем перенос строки, если это не последняя часть
-//            if (i < parts.length - 1) {
-//                builder.append("\n");
-//            }
-//        }
-//    }
-//    private String decodeHtmlEntities(String text) {
-//        if (text == null) return "";
-//
-//        return text.replace("&lt;", "<")
-//                .replace("&gt;", ">")
-//                .replace("&amp;", "&")
-//                .replace("&quot;", "\"")
-//                .replace("&#39;", "'");
-//    }
     private SpannableString processHtmlPart(String html) {
         if (html == null || html.isEmpty()) {
             return new SpannableString("");
@@ -515,104 +386,6 @@ public class TextBlock extends ContentBlock {
 
         return spannable;
     }
-
-    //    private void applyFontSizesFromHtml(SpannableString spannable, String html, String plainText) {
-//        if (!html.contains("<font")) {
-//            return;
-//        }
-//
-//        Log.d("TextBlock", "applyFontSizesFromHtml: plainText='" + plainText + "', длина=" + plainText.length());
-//
-//        // Используем более надежный парсинг HTML
-//        Pattern pattern = Pattern.compile("<font size=\"(\\d+)\">(.*?)</font>", Pattern.DOTALL);
-//        Matcher matcher = pattern.matcher(html);
-//
-//        int lastEnd = 0;
-//        StringBuilder textBuilder = new StringBuilder();
-//
-//        // Собираем текст без тегов для точного сопоставления позиций
-//        String textWithoutTags = Html.fromHtml(html).toString();
-//
-//        Log.d("TextBlock", "Текст без тегов: '" + textWithoutTags + "'");
-//        Log.d("TextBlock", "Оригинальный plainText: '" + plainText + "'");
-//
-//        // Используем точное сопоставление через позиции в тексте без тегов
-//        int currentTextPosition = 0;
-//
-//        while (matcher.find()) {
-//            int fontSize = Integer.parseInt(matcher.group(1));
-//            String htmlContent = matcher.group(2);
-//            String segmentText = Html.fromHtml(htmlContent).toString();
-//
-//            Log.d("TextBlock", "Найден тег font: размер=" + fontSize +
-//                    ", HTML='" + htmlContent + "', текст='" + segmentText + "'");
-//
-//            if (!segmentText.isEmpty()) {
-//                // Находим позицию в оригинальном тексте
-//                int start = textWithoutTags.indexOf(segmentText, currentTextPosition);
-//                if (start != -1) {
-//                    int end = start + segmentText.length();
-//
-//                    // Проверяем, что позиции в пределах spannable
-//                    if (start <= spannable.length() && end <= spannable.length()) {
-//                        // Применяем размер шрифта
-//                        AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize, true);
-//                        spannable.setSpan(sizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//
-//                        Log.d("TextBlock", "Применен спан: " + start + "-" + end +
-//                                ", размер=" + fontSize + ", текст='" + segmentText + "'");
-//                    }
-//
-//                    currentTextPosition = end;
-//                } else {
-//                    Log.e("TextBlock", "Не найдена позиция для текста: '" + segmentText +
-//                            "' в тексте без тегов");
-//                }
-//            }
-//        }
-//    }
-//    private void applyFontSizesFromHtml(SpannableString spannable, String html, String plainText) {
-//        if (!html.contains("<font")) {
-//            return;
-//        }
-//
-//        Log.d("TextBlock", "applyFontSizesFromHtml: plainText='" + plainText + "', длина=" + plainText.length());
-//
-//        // Удаляем все <br> для парсинга
-//        String htmlWithoutBr = html.replace("<br>", "");
-//
-//        Pattern pattern = Pattern.compile("<font size=\"(\\d+)\">(.*?)</font>", Pattern.DOTALL);
-//        Matcher matcher = pattern.matcher(htmlWithoutBr);
-//
-//        int currentPosition = 0;
-//
-//        while (matcher.find()) {
-//            int fontSize = Integer.parseInt(matcher.group(1));
-//            String htmlContent = matcher.group(2);
-//            String segmentText = Html.fromHtml(htmlContent).toString();
-//
-//            if (!segmentText.isEmpty()) {
-//                // Находим позицию в plainText
-//                int start = plainText.indexOf(segmentText, currentPosition);
-//                if (start != -1) {
-//                    int end = start + segmentText.length();
-//
-//                    if (start <= spannable.length() && end <= spannable.length()) {
-//                        AbsoluteSizeSpan sizeSpan = new AbsoluteSizeSpan(fontSize, true);
-//                        spannable.setSpan(sizeSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//
-//                        Log.d("TextBlock", "Применен спан: " + start + "-" + end +
-//                                ", размер=" + fontSize + ", текст='" + segmentText + "'");
-//
-//                        currentPosition = end;
-//                    }
-//                } else {
-//                    Log.e("TextBlock", "Не найдена позиция для текста: '" + segmentText +
-//                            "' в тексте: '" + plainText + "'");
-//                }
-//            }
-//        }
-//    }
 
     public int getFontSizeAt(int position) {
         Log.d("TextBlock", "getFontSizeAt: position=" + position);
@@ -660,7 +433,7 @@ public class TextBlock extends ContentBlock {
         return rawHtmlContent;
     }
 
-    // ДОБАВЛЯЕМ: метод для отладки
+    // Метод для отладки
     @Override
     public String toString() {
         return "TextBlock{id='" + id + "', text='" + text + "'}";

@@ -39,20 +39,20 @@ public class SearchByTagAdapter extends RecyclerView.Adapter<SearchByTagAdapter.
         String tag = tags.get(position);
         holder.tagTextView.setText("#" + tag);
 
-        // Устанавливаем цвет в зависимости от выбора
+        // Установка цвета в зависимости от выбора
         boolean isSelected = tag.equals(selectedTag);
         updateCardAppearance(holder, isSelected);
 
         // Обработчик клика
         holder.tagCard.setOnClickListener(v -> {
             if (listener != null) {
-                // Если тег уже выбран - снимаем выделение (передаем null)
+                // Если тег уже выбран - снятие выделения ( null)
                 if (tag.equals(selectedTag)) {
                     selectedTag = null;
                     updateCardAppearance(holder, false);
                     listener.onTagClick(null);
                 } else {
-                    // Выбираем новый тег
+                    // Выбор нового тега
                     selectedTag = tag;
                     updateCardAppearance(holder, true);
                     listener.onTagClick(tag);
@@ -76,9 +76,9 @@ public class SearchByTagAdapter extends RecyclerView.Adapter<SearchByTagAdapter.
         notifyDataSetChanged();
     }
 
-    public String getSelectedTag() {
-        return selectedTag;
-    }
+//    public String getSelectedTag() {
+//        return selectedTag;
+//    }
 
     @Override
     public int getItemCount() {
@@ -103,7 +103,7 @@ public class SearchByTagAdapter extends RecyclerView.Adapter<SearchByTagAdapter.
         String previousSelected = selectedTag;
         selectedTag = null;
 
-        // Уведомляем об изменении, если был выбранный тег
+        // Уведомление об изменении, если был выбранный тег
         if (previousSelected != null) {
             int position = tags.indexOf(previousSelected);
             if (position != -1) {

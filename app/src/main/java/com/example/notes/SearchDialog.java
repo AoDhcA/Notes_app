@@ -1,7 +1,5 @@
 package com.example.notes;
 
-import static com.google.android.material.internal.ViewUtils.hideKeyboard;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -10,9 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -69,7 +65,7 @@ public class SearchDialog extends Dialog {
     private void loadAllDocuments() {
         new Thread(() -> {
             allDocuments = databaseHelper.getAllDocuments();
-            // Показываем все документы при открытии
+            // Показать все документы при открытии
             activity.runOnUiThread(() -> {
                 searchResults.clear();
                 searchResults.addAll(allDocuments);
@@ -109,7 +105,7 @@ public class SearchDialog extends Dialog {
 
     private void performSearch(String query) {
         if (query.trim().isEmpty()) {
-            // Показываем все документы если запрос пустой
+            // Показать все документы если запрос пустой
             searchResults.clear();
             searchResults.addAll(allDocuments);
             searchAdapter.updateResults(searchResults);
@@ -119,14 +115,14 @@ public class SearchDialog extends Dialog {
         new Thread(() -> {
             List<DocxFile> results = new ArrayList<>();
 
-            // ПОИСК ПО НАЗВАНИЮ
+            // Поиск по названию
             List<DocxFile> titleResults = databaseHelper.searchDocuments(query);
             results.addAll(titleResults);
 
-            // ПОИСК ПО ТЕГАМ (ЛОГИЧЕСКОЕ И) - ИСПОЛЬЗУЕМ НОВЫЙ МЕТОД
+            // Поиск по тегам (лог и)
             List<DocxFile> tagResults = databaseHelper.searchByMultipleTags(query);
             for (DocxFile file : tagResults) {
-                // Добавляем только если еще нет в результатах
+                // Добавить только если еще нет в результатах
                 boolean alreadyExists = false;
                 for (DocxFile existing : results) {
                     if (existing.getFilePath().equals(file.getFilePath())) {
@@ -139,20 +135,20 @@ public class SearchDialog extends Dialog {
                 }
             }
 
-            // Обновляем UI в основном потоке
+            // Обновление UI в основном потоке
             activity.runOnUiThread(() -> {
                 searchResults.clear();
                 searchResults.addAll(results);
                 searchAdapter.updateResults(searchResults);
 
-                // Показываем количество результатов
+                // Показать количество результатов
                 Toast.makeText(activity, "Найдено: " + results.size() + " файлов", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
 
     private void onSearchItemClick(DocxFile file) {
-        // Закрываем диалог и открываем файл
+        // Закрыть диалога и открыть файла
         dismiss();
         activity.openDocxFile(file);
     }
@@ -160,7 +156,7 @@ public class SearchDialog extends Dialog {
     @Override
     protected void onStop() {
         super.onStop();
-        // ЗАКРЫВАЕМ АДАПТЕР И БАЗУ ДАННЫХ
+        // закрыт адаптер и БД
     }
 
     private void hideKeyboard() {

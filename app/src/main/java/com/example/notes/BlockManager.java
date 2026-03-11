@@ -1,17 +1,13 @@
 package com.example.notes;
 
 import android.content.Context;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,92 +54,6 @@ public class BlockManager {
         this.contentChangeListener = listener;
     }
 
-    // Метод для сохранения состояния блоков перед операциями
-    public void saveAllBlockStates() {
-        blockStates.clear();
-
-        for (int i = 0; i < Math.min(container.getChildCount(), blocks.size()); i++) {
-            View blockView = container.getChildAt(i);
-            ContentBlock block = blocks.get(i);
-
-            if (block instanceof TextBlock && blockView instanceof EditText) {
-                TextBlock textBlock = (TextBlock) block;
-                EditText editText = (EditText) blockView;
-
-                // Сохраняем HTML контент
-                String htmlContent = textBlock.getHtmlContent();
-
-                // Сохраняем позицию курсора и выделение
-                int selectionStart = editText.getSelectionStart();
-                int selectionEnd = editText.getSelectionEnd();
-                boolean hasFocus = editText.hasFocus();
-
-                // Если null, значит обычный текст
-                if (shouldSaveBlockState(textBlock)) {
-                    blockStates.put(block.getId(), new BlockState(htmlContent, selectionStart, selectionEnd, hasFocus));
-                    Log.d("BlockManager", "Сохранено состояние блока " + block.getId() +
-                            ": selection=" + selectionStart + "-" + selectionEnd + ", focus=" + hasFocus);
-                } else {
-                    Log.d("BlockManager", "Пропущено сохранение состояния блока " + block.getId() + " (был изменен)");
-                }
-            }
-        }
-    }
-
-    private boolean shouldSaveBlockState(TextBlock textBlock) {
-        // Если HTML null, значит обычный текст без форматирования
-        if (textBlock.getHtmlContent() == null) {
-            return true;
-        }
-        return true;
-    }
-
-    // Метод для восстановления состояния ВСЕХ блоков после операций
-    public void restoreAllBlockStates() {
-        Log.d("BlockManager", "=== ВОССТАНОВЛЕНИЕ СОСТОЯНИЙ БЛОКОВ ===");
-        for (int i = 0; i < Math.min(container.getChildCount(), blocks.size()); i++) {
-            View blockView = container.getChildAt(i);
-            ContentBlock block = blocks.get(i);
-
-            BlockState savedState = blockStates.get(block.getId());
-            if (savedState != null && block instanceof TextBlock && blockView instanceof EditText) {
-                TextBlock textBlock = (TextBlock) block;
-                EditText editText = (EditText) blockView;
-
-                Log.d("BlockManager", "Восстановление блока " + block.getId() +
-                        ", HTML: " + savedState.htmlContent);
-                // Восстанавливаем HTML контент
-                if (savedState.htmlContent != null) {
-                    textBlock.setHtmlContent(savedState.htmlContent);
-                    SpannableString spannable = textBlock.htmlToSpannable(savedState.htmlContent);
-                    editText.setText(spannable);
-
-                    // Восстанавливаем позицию курсора и выделение
-                    if (savedState.selectionStart >= 0 && savedState.selectionStart <= editText.getText().length() &&
-                            savedState.selectionEnd >= 0 && savedState.selectionEnd <= editText.getText().length()) {
-
-                        editText.setSelection(savedState.selectionStart, savedState.selectionEnd);
-                    }
-
-                    // Восстанавливаем фокус, если был
-                    if (savedState.hasFocus) {
-                        editText.requestFocus();
-
-                        // Уведомляем о фокусе
-                        if (focusListener != null) {
-                            focusListener.onBlockFocused(block.getId(), editText);
-                        }
-                    }
-                }
-
-                Log.d("BlockManager", "Восстановлено состояние блока " + block.getId() +
-                        ": selection=" + savedState.selectionStart + "-" + savedState.selectionEnd);
-            }
-        }
-
-        blockStates.clear();
-        Log.d("BlockManager", "=== ВОССТАНОВЛЕНИЕ ЗАВЕРШЕНО ===");
-    }
 
     // Отслеживание текущих View
     private List<View> currentViews = new ArrayList<>();
@@ -291,55 +201,6 @@ public class BlockManager {
                     Log.d("BlockManager", "Сохранено форматирование для TextBlock " + textBlock.getId());
                 }
             }
-        }
-    }
-
-    public void renderBlocksWithoutRestore() {
-        Log.d("BlockManager", "renderBlocksWithoutRestore: начало");
-        if (isRendering) {
-            Log.d("BlockManager", "renderBlocksWithoutRestore: пропуск, уже выполняется рендеринг");
-            return;
-        }
-        isRendering = true;
-        try {
-            // Сохранение форматирования перед перерисовкой
-            saveCurrentFormatting();
-
-            container.removeAllViews();
-            currentViews.clear();
-
-            for (int i = 0; i < blocks.size(); i++) {
-                ContentBlock block = blocks.get(i);
-
-                if (block instanceof TextBlock) {
-                    TextBlock textBlock = (TextBlock) block;
-                    Log.d("BlockManager", "Создание View для TextBlock " + i +
-                            ", HTML: " + textBlock.getHtmlContent());
-                }
-
-                View blockView = block.createView(context);
-                Log.d("BlockManager", "Создан View для блока " + i + ": " + block.getType() + ", ID: " + block.getId());
-
-                container.addView(blockView);
-                currentViews.add(blockView);
-
-                // Восстанавливает форматирование после добавления в контейнер
-                restoreFormatting(block, blockView);
-
-                // Настройка фокуса и слушателей
-                if (block instanceof TextBlock) {
-                    setupFocusTracking((TextBlock) block, blockView);
-                }
-                if (block instanceof TableBlock) {
-                    TableBlock tableBlock = (TableBlock) block;
-                    tableBlock.setOnTableDeleteListener(tableDeleteListener);
-                }
-            }
-
-            Log.d("BlockManager", "renderBlocksWithoutRestore: завершено");
-
-        } finally {
-            isRendering = false;
         }
     }
 

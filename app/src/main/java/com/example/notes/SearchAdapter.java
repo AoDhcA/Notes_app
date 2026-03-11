@@ -36,11 +36,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DocxFile file = searchResults.get(position);
 
-        // Устанавливаем отображаемое название (обрезанное)
+        // Установка отображаемого названия
         String displayName = truncateFileName(file.getFileName(), 25);
         holder.fileName.setText(displayName);
 
-        // Устанавливаем теги - ТЕПЕРЬ РЕАЛЬНЫЕ
+        // Установка тегов
         String tags = getDisplayTags(file.getFilePath());
         if (!tags.isEmpty()) {
             holder.fileTags.setText(tags);
@@ -80,13 +80,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
     private String getDisplayTags(String filePath) {
-        // ПОЛУЧАЕМ РЕАЛЬНЫЕ ТЕГИ ИЗ БАЗЫ ДАННЫХ
+        // Получение тегов из БД
         String tags = databaseHelper.getDocumentTags(filePath);
         if (tags == null || tags.trim().isEmpty()) {
             return "";
         }
 
-        // ПРЕОБРАЗУЕМ "тег1,тег2" В "#тег1 #тег2"
+        // преобразование "тег1,тег2" В "#тег1 #тег2"
         String[] tagArray = tags.split(",");
         StringBuilder displayTags = new StringBuilder();
 
@@ -117,7 +117,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             super(itemView);
             itemCard = itemView.findViewById(R.id.searchItemCard);
             fileName = itemView.findViewById(R.id.searchFileName);
-//            filePreview = itemView.findViewById(R.id.searchFilePreview);
             fileTags = itemView.findViewById(R.id.searchFileTags);
         }
     }

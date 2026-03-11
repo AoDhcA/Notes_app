@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
@@ -84,9 +83,7 @@ public class TagEditText extends AppCompatEditText {
         });
     }
 
-    /**
-     * Получить список тегов (без #)
-     */
+    // Получить список тегов (без #)
     public java.util.List<String> getTagsList() {
         String text = getText().toString().trim();
         if (text.isEmpty()) return new java.util.ArrayList<>();
@@ -105,9 +102,7 @@ public class TagEditText extends AppCompatEditText {
         return tags;
     }
 
-    /**
-     * Установить список тегов (автоматически добавляет #)
-     */
+    // Установить список тегов (автоматически добавляет #)
     public void setTagsList(java.util.List<String> tags) {
         if (tags == null || tags.isEmpty()) {
             setText("");
@@ -127,17 +122,13 @@ public class TagEditText extends AppCompatEditText {
         isEditing = false;
     }
 
-    /**
-     * Получить теги в формате для хранения в БД
-     */
+    // Получить теги в формате для хранения в БД
     public String getTagsForStorage() {
         java.util.List<String> tags = getTagsList();
         return android.text.TextUtils.join(",", tags);
     }
 
-    /**
-     * Загрузить теги из формата БД
-     */
+    // Загрузить теги из формата БД
     public void setTagsFromStorage(String storedTags) {
         if (storedTags == null || storedTags.trim().isEmpty()) {
             setText("");
