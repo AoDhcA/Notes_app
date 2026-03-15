@@ -187,17 +187,10 @@ public class BlockManager {
                 TextBlock textBlock = (TextBlock) block;
                 EditText editText = (EditText) blockView;
 
-                // Пропуск блоков, помеченныех как измененные
-                if (textBlock.wasModified()) {
-                    Log.d("BlockManager", "Пропущено сохранение для измененного блока " + textBlock.getId());
-                    textBlock.clearModifiedFlag(); // Сброс флага после рендера
-                    continue;
-                }
-
                 // Сохранение Spannable в HTML перед удалением View
                 if (editText.getText() instanceof Spannable) {
                     Spannable spannable = (Spannable) editText.getText();
-                    textBlock.updateHtmlFromSpannable(spannable);
+                    textBlock.updateFromSpannable(spannable);
                     Log.d("BlockManager", "Сохранено форматирование для TextBlock " + textBlock.getId());
                 }
             }
@@ -215,12 +208,12 @@ public class BlockManager {
             // Восстанавливает форматирование из HTML
             if (textBlock.getHtmlContent() != null && !textBlock.getHtmlContent().isEmpty()) {
                 try {
-                    SpannableString spannable = textBlock.htmlToSpannable(textBlock.getHtmlContent());
+                    SpannableString spannable = textBlock.toSpannable();
                     editText.setText(spannable);
 
                     // принудителтное обновление Spannable в TextBlock
                     if (editText.getText() instanceof Spannable) {
-                        textBlock.updateHtmlFromSpannable((Spannable) editText.getText());
+                        textBlock.updateFromSpannable((Spannable) editText.getText());
                     }
 
                     // Проверка результата
@@ -285,7 +278,7 @@ public class BlockManager {
         for (ContentBlock block : blocks) {
             if (block instanceof TextBlock) {
                 TextBlock textBlock = (TextBlock) block;
-                String content = textBlock.getPlainText();
+                String content = textBlock.getPlainText(); // или getRawContent()?
                 if (content != null && !content.trim().isEmpty()) {
                     preview.append(content).append(" ");
                     hasContent = true;
@@ -330,7 +323,7 @@ public class BlockManager {
                     // Сохранение Spannable в HTML только если есть реальное форматирование
                     if (editText.getText() instanceof Spannable) {
                         Spannable spannable = (Spannable) editText.getText();
-                        textBlock.updateHtmlFromSpannable(spannable);
+                        textBlock.updateFromSpannable(spannable);
                     }
                 }
 

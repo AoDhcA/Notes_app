@@ -42,10 +42,10 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     dependencies {
-        implementation("org.apache.poi:poi:5.2.5") // Для базовой поддержки .docx
-        implementation("org.apache.poi:poi-ooxml:5.2.5") // Для полной поддержки OOXML (.docx)
-        implementation("androidx.recyclerview:recyclerview:1.2.1")
+        implementation("org.apache.poi:poi:5.5.1") // Для базовой поддержки .docx
+        implementation("org.apache.poi:poi-ooxml:5.5.1") // Для полной поддержки OOXML (.docx)
+        implementation("androidx.recyclerview:recyclerview:1.4.0")
         implementation("androidx.multidex:multidex:2.0.1")
-        implementation("androidx.activity:activity:1.8.0")
+        implementation("androidx.activity:activity:1.13.0")
     }
 }

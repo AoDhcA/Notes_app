@@ -76,10 +76,6 @@ public class SearchByTagAdapter extends RecyclerView.Adapter<SearchByTagAdapter.
         notifyDataSetChanged();
     }
 
-//    public String getSelectedTag() {
-//        return selectedTag;
-//    }
-
     @Override
     public int getItemCount() {
         return tags.size();

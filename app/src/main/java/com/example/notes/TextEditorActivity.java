@@ -18,13 +18,11 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.AbsoluteSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
@@ -43,12 +41,11 @@ import androidx.cardview.widget.CardView;
 import java.io.File;
 import java.util.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 
-public class TextEditorActivity extends AppCompatActivity implements DocxAdapter.OnItemClickListener, BlockFocusListener, TableBlock.OnTableDeleteListener {
+public class TextEditorActivity extends AppCompatActivity implements BlockFocusListener, TableBlock.OnTableDeleteListener {
     private EditText titleEditText;
     private String filePath;
     private String originalFileName;
@@ -82,8 +79,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     private TextView increaseTextSizeTV;
     private TextView currentTextSizeTV;
     private int currentFontSize = 16; // размер по умолчанию
-    private final int MIN_FONT_SIZE = 10;
-    private final int MAX_FONT_SIZE = 25;
     private DatabaseHelper databaseHelper;
     private ScrollView scrollView;
     private ViewTreeObserver.OnGlobalLayoutListener keyboardLayoutListener;
@@ -113,15 +108,13 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
                 createNewFile();
                 initTableEditDialog();
                 initFontSizeControls();
-                initTagsField();
-                initListDialog();
             } else {
                 initViews();
                 loadFileContent();
                 debugScrollViewState();
-                initTagsField();
-                initListDialog();
             }
+            initTagsField();
+            initListDialog();
 
             // Настройка обработчика кнопки "Назад"
             setupBackPressHandler();
@@ -349,8 +342,8 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         if (focusedBlockId != null && focusedEditText != null) {
             ContentBlock block = blockManager.getBlockById(focusedBlockId);
             if (block instanceof TextBlock) {
-                TextBlock textBlock = (TextBlock) block;
-                int fontSize = textBlock.getFontSizeAt(position);
+                //TextBlock textBlock = (TextBlock) block;
+                int fontSize = TextFormattingHelper.getFontSizeAtPosition(focusedEditText.getText(), position);
                 Log.d("FontSizeDebug", "Получен размер из TextBlock: " + fontSize);
                 return fontSize;
             }
@@ -361,56 +354,31 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
     }
 
     private void adjustFontSize(int delta) {
-        Log.d("FontSizeDebug", "adjustFontSize вызван: delta=" + delta + ", currentFontSize=" + currentFontSize);
         int newSize = currentFontSize + delta;
-        Log.d("FontSizeDebug", "Новый размер: " + newSize + ", MIN=" + MIN_FONT_SIZE + ", MAX=" + MAX_FONT_SIZE);
-
-        // Проверяем границы
-        if (newSize >= MIN_FONT_SIZE && newSize <= MAX_FONT_SIZE) {
+        if (newSize >= TextFormattingHelper.MIN_FONT_SIZE && newSize <= TextFormattingHelper.MAX_FONT_SIZE) {
             currentFontSize = newSize;
-            Log.d("FontSizeDebug", "Применяем новый размер: " + currentFontSize);
             applyFontSizeToSelection(currentFontSize);
             updateFontSizeDisplay();
         } else {
-            // Показываем сообщение о достижении предела
-            String message = delta > 0 ?
-                    "Максимальный размер: " + MAX_FONT_SIZE + "sp" :
-                    "Минимальный размер: " + MIN_FONT_SIZE + "sp";
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            Log.d("FontSizeDebug", "Достигнут предел: " + message);
+            Toast.makeText(this, "Предел размера", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void applyFontSizeToSelection(int sizeSp) {
-        Log.d("FontSizeDebug", "applyFontSizeToSelection: sizeSp=" + sizeSp);
-        Log.d("FontSizeDebug", "focusedBlockId: " + focusedBlockId);
-        Log.d("FontSizeDebug", "focusedEditText: " + focusedEditText);
-
         if (focusedBlockId != null && focusedEditText != null) {
             ContentBlock block = blockManager.getBlockById(focusedBlockId);
-            Log.d("FontSizeDebug", "Найден блок: " + (block != null ? block.getId() : "null"));
-
             if (block instanceof TextBlock) {
-                TextBlock textBlock = (TextBlock) block;
                 int start = focusedEditText.getSelectionStart();
                 int end = focusedEditText.getSelectionEnd();
-                Log.d("FontSizeDebug", "Диапазон выделения: start=" + start + ", end=" + end);
-
                 if (start != end) {
-                    Log.d("FontSizeDebug", "Применяем размер к выделенному тексту");
-                    textBlock.applyFontSize(start, end, sizeSp);
+                    Editable editable = focusedEditText.getText();
+                    TextFormattingHelper.applyFontSize(editable, start, end, sizeSp);
+                    ((TextBlock) block).updateFromSpannable(editable);
                     markContentChanged();
-                    Log.d("FontSizeDebug", "Размер применен успешно");
                 } else {
-                    Log.d("FontSizeDebug", "Нет выделения текста");
-                    Toast.makeText(this, "Выделите текст для изменения размера", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Выделите текст", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Log.d("FontSizeDebug", "Блок не является TextBlock");
             }
-        } else {
-            Log.d("FontSizeDebug", "Нет активного блока или EditText");
-            Toast.makeText(this, "Сначала выберите текстовый блок", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -445,7 +413,10 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
                         ContentBlock block = blockManager.getBlockById(focusedBlockId);
                         if (block instanceof TextBlock) {
                             TextBlock textBlock = (TextBlock) block;
-                            textBlock.updateHtmlFromSpannable((Spannable) s);
+
+
+                            textBlock.updateFromSpannable(focusedEditText.getText());
+
                             markContentChanged();
                             Log.d("TextChange", "TextBlock обновлен: " + textBlock.getHtmlContent());
                         }
@@ -454,7 +425,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             };
 
             focusedEditText.addTextChangedListener(textWatcher);
-            // Сохраняем ссылку на слушатель в tag
+            // Сохраняем ссылку на слушателя в tag
             focusedEditText.setTag(R.id.text_watcher, textWatcher);
         }
     }
@@ -711,7 +682,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             if (blocksContainer == null) Log.e("InitViews", "blocksContainer not found");
             if (btnAddTable == null) Log.e("InitViews", "btnAddTable not found");
 
-            // Инициализация BlockManager с слушателем изменений
+            // Инициализация BlockManager со слушателем изменений
             blockManager = new BlockManager(blocksContainer, this);
             blockManager.setOnContentChangeListener(new BlockManager.OnContentChangeListener() {
                 @Override
@@ -896,28 +867,13 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
 
                 // ПРИМЕНЯЕМ ФОРМАТИРОВАНИЕ НЕМЕДЛЕННО
                 if (textBlock.hasRealFormatting() && textBlock.getHtmlContent() != null) {
-                    SpannableString spannable = textBlock.htmlToSpannable(textBlock.getHtmlContent());
+                    SpannableString spannable = TextFormattingHelper.fromHtml(textBlock.getHtmlContent());
                     editText.setText(spannable);
                     Log.d("TableDelete", "Форматирование применено к View блока " + textBlock.getId());
                 } else {
                     editText.setText(textBlock.getPlainText());
                     Log.d("TableDelete", "Обычный текст применен к View блока " + textBlock.getId());
                 }
-            }
-        }
-    }
-
-
-    // Рекурсивный поиск EditText в сложных View
-    private void findAndUpdateEditTextImmediately(View view, String newText) {
-        if (view instanceof EditText) {
-            EditText editText = (EditText) view;
-            editText.setText(newText);
-            Log.d("TableDelete", "EditText найден и обновлен: '" + newText + "'");
-        } else if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                findAndUpdateEditTextImmediately(group.getChildAt(i), newText);
             }
         }
     }
@@ -942,31 +898,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             }
         }
         return null;
-    }
-
-    private void setupFocusForChildViews(View view) {
-        if (view instanceof EditText) {
-            EditText editText = (EditText) view;
-            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        focusedEditText = (EditText) v;
-                        // Находим ID блока по tag
-                        Object tag = v.getTag();
-                        if (tag != null && tag.toString().startsWith("TextBlock_")) {
-                            focusedBlockId = tag.toString().replace("TextBlock_", "");
-                        }
-                        cursorPosition = editText.getSelectionStart();
-                    }
-                }
-            });
-        } else if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                setupFocusForChildViews(group.getChildAt(i));
-            }
-        }
     }
 
     @Override
@@ -1107,17 +1038,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         dialog.show();
     }
 
-    // Метод для поиска индекса блока по ID
-    private int findBlockIndexById(String blockId) {
-        List<ContentBlock> blocks = blockManager.getBlocks();
-        for (int i = 0; i < blocks.size(); i++) {
-            if (blocks.get(i).getId().equals(blockId)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private void showTableCreationDialog(boolean onCursor) {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -1212,69 +1132,51 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         if (focusedBlockId == null || focusedEditText == null) return;
 
         try {
-            Log.d("TableInsert", "=== УПРОЩЕННЫЙ МЕТОД С ФОРМАТИРОВАНИЕМ ===");
-
-            // Получаем текущий текст и позицию курсора
             Spannable spannable = (Spannable) focusedEditText.getText();
-            String currentText = spannable.toString();
             int cursorPos = focusedEditText.getSelectionStart();
+            int totalLength = spannable.length();
 
-            Log.d("TableInsert", "Исходный текст: '" + currentText + "'");
-            Log.d("TableInsert", "Курсор на позиции: " + cursorPos);
-
-            // Создаем Spannable для текста до курсора
+            // Создаём текст до курсора
             SpannableString beforeSpannable = new SpannableString(spannable.subSequence(0, cursorPos));
-
-            // Обновляем EditText с сохранением форматирования
             focusedEditText.setText(beforeSpannable);
 
-            Log.d("TableInsert", "Текст после обрезки: '" + focusedEditText.getText().toString() + "'");
-
-            // Обновляем блок из измененного EditText
-            int currentBlockIndex = findBlockIndexById(focusedBlockId);
+            // Получаем текущий блок и обновляем его
             ContentBlock currentBlock = blockManager.getBlockById(focusedBlockId);
-            if (currentBlock instanceof TextBlock) {
-                TextBlock textBlock = (TextBlock) currentBlock;
-                textBlock.updateHtmlFromSpannable((Spannable) focusedEditText.getText());
-                Log.d("TableInsert", "TextBlock обновлен с HTML: " + textBlock.getHtmlContent());
+            if (!(currentBlock instanceof TextBlock)) {
+                Log.e("TableInsert", "Текущий блок не TextBlock");
+                return;
+            }
+            TextBlock currentTextBlock = (TextBlock) currentBlock;
+            currentTextBlock.updateFromSpannable(focusedEditText.getText());
+
+            // Создаём блок для текста после курсора, если он не пустой
+            SpannableString afterSpannable = null;
+            if (cursorPos < totalLength) {
+                CharSequence afterSeq = spannable.subSequence(cursorPos, totalLength);
+                if (afterSeq.length() > 0 && !afterSeq.toString().trim().isEmpty()) {
+                    afterSpannable = new SpannableString(afterSeq);
+                }
             }
 
-            // Создаем новый блок для текста после курсора
-            SpannableString afterSpannable = new SpannableString(spannable.subSequence(cursorPos, currentText.length()));
-            TextBlock afterCursorBlock = new TextBlock();
-            afterCursorBlock.updateHtmlFromSpannable(afterSpannable);
-
-            // Создаем таблицу
+            // Создаём таблицу
             TableBlock tableBlock = new TableBlock(rows, cols);
 
             // Вставляем блоки
+            int currentBlockIndex = blockManager.getBlockIndexById(focusedBlockId);
             blockManager.insertBlock(currentBlockIndex + 1, tableBlock);
-            blockManager.insertBlock(currentBlockIndex + 2, afterCursorBlock);
+
+            if (afterSpannable != null) {
+                TextBlock afterCursorBlock = new TextBlock();
+                afterCursorBlock.updateFromSpannable(afterSpannable);
+                blockManager.insertBlock(currentBlockIndex + 2, afterCursorBlock);
+            }
 
             markContentChanged();
-
-            Log.d("TableInsert", "=== ЗАВЕРШЕНИЕ УПРОЩЕННОГО МЕТОДА ===");
+            Log.d("TableInsert", "Таблица вставлена, afterSpannable " + (afterSpannable != null ? "не пуст" : "пуст"));
 
         } catch (Exception e) {
             Log.e("TableInsert", "Ошибка: " + e.getMessage(), e);
         }
-    }
-
-
-    private View findViewInGroup(ViewGroup group, String blockId) {
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-            Object tag = child.getTag();
-            if (tag != null && tag.toString().contains(blockId)) {
-                return child;
-            }
-
-            if (child instanceof ViewGroup) {
-                View found = findViewInGroup((ViewGroup) child, blockId);
-                if (found != null) return found;
-            }
-        }
-        return null;
     }
 
     private void saveAndExit() {
@@ -1283,10 +1185,10 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         Log.d("SaveDebug", "filePath: " + filePath);
         Log.d("SaveDebug", "isContentChanged: " + isContentChanged);
 
-        // ОБНОВЛЯЕМ ДАННЫЕ ПЕРЕД ПРОВЕРКОЙ
+        // Обновление данных перед проверкой
         blockManager.updateAllBlocksFromViews();
 
-        // Для НОВЫХ файлов проверяем, не пустой ли документ
+        // Проверка для новых файлов, не пустой ли документ
         if (isNewFile && isEmptyDocument()) {
             Log.d("SaveDebug", "❌ Пустой документ, отмена создания");
 
@@ -1301,10 +1203,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             return;
         }
 
-        // Продолжаем обычную проверку изменений
-        List<ContentBlock> blocks = blockManager.getBlocks();
-
-        // ТОЧНАЯ ПРОВЕРКА ИЗМЕНЕНИЙ
+        // проверка изменений
         boolean shouldSave = hasRealChanges();
 
         if (!shouldSave) {
@@ -1334,7 +1233,7 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             }
         }
 
-        // Получаем теги ДО запуска AsyncTask
+        // Получаем теги до запуска AsyncTask
         String preview = blockManager.getContentPreview();
         String currentTags = tagEditText.getTagsForStorage();
 
@@ -1461,7 +1360,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             @Override
             protected void onPostExecute(List<ContentBlock> blocks) {
                 if (titleEditText != null) {
-                    // ОЧИЩАЕМ И ДОБАВЛЯЕМ БЛОКИ
                     blockManager.getBlocks().clear();
 
                     for (ContentBlock block : blocks) {
@@ -1472,10 +1370,10 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
                     titleEditText.setText(displayName);
                     originalTitle = displayName;
 
-                    // Сохраняем исходное состояние ПОСЛЕ того как все блоки добавлены
+                    // Сохраняем исходное состояние после того как все блоки добавлены
                     saveOriginalBlocksState();
 
-                    isInitialLoadComplete = true; // УСТАНАВЛИВАЕМ ФЛАГ
+                    isInitialLoadComplete = true;
                     isContentChanged = false;
                     updateActivityTitle();
 
@@ -1967,23 +1865,6 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
         return str1.equals(str2);
     }
 
-    // Методы интерфейса DocxAdapter.OnItemClickListener
-    @Override
-    public void onItemClick(DocxFile file) {
-        // Не используется в этом контексте, но требуется интерфейсом
-    }
-
-    @Override
-    public void onSelectionModeStarted() {
-        // Не используется в этом контексте
-    }
-
-    @Override
-    public void onSelectionChanged(int selectedCount) {
-        // Не используется в этом контексте
-    }
-
-
     // Метод для инициализации диалога списков
     private void initListDialog() {
         listDialog = new Dialog(this);
@@ -2064,119 +1945,29 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
 
     private void applyNumberedList() {
         if (focusedEditText == null) return;
-
         Editable editable = focusedEditText.getText();
         int start = focusedEditText.getSelectionStart();
         int end = focusedEditText.getSelectionEnd();
-
-        Log.d("ListDebug", "=== ПРИМЕНЕНИЕ НУМЕРОВАННОГО СПИСКА ===");
-        Log.d("ListDebug", "Выделение: start=" + start + ", end=" + end);
-        Log.d("ListDebug", "Текст выделения: '" + editable.subSequence(start, end).toString() + "'");
-
-        // Если нет выделения, работаем с текущим абзацем
         if (start == end) {
-            int paragraphStart = findParagraphStart(editable, start);
-            int paragraphEnd = findParagraphEnd(editable, start);
-            formatParagraphAsNumberedList(editable, paragraphStart, paragraphEnd, 1);
-            focusedEditText.setSelection(paragraphEnd);
-        } else {
-            // СОБИРАЕМ ВСЕ АБЗАЦЫ СНАЧАЛА
-            List<ParagraphInfo> paragraphs = new ArrayList<>();
-            int currentPos = start;
-
-            while (currentPos < end) {
-                int paragraphStart = findParagraphStart(editable, currentPos);
-                int paragraphEnd = findParagraphEnd(editable, currentPos);
-
-                // Ограничиваем выделением
-                if (paragraphStart < start) paragraphStart = start;
-                if (paragraphEnd > end) paragraphEnd = end;
-
-                // Получаем текст абзаца
-                String paragraphText = editable.subSequence(paragraphStart, paragraphEnd).toString();
-
-                if (!paragraphText.trim().isEmpty()) {
-                    paragraphs.add(new ParagraphInfo(paragraphStart, paragraphEnd, paragraphText));
-                    Log.d("ListDebug", "Собран абзац " + paragraphs.size() + ": [" + paragraphStart + "-" + paragraphEnd + "] '" + paragraphText + "'");
-                }
-
-                // Переходим к следующему абзацу
-                currentPos = paragraphEnd + 1;
-                if (currentPos >= editable.length() || currentPos >= end) break;
-            }
-
-            Log.d("ListDebug", "Всего собрано абзацев: " + paragraphs.size());
-
-            // ФОРМАТИРУЕМ С КОНЦА, чтобы позиции не смещались
-            for (int i = paragraphs.size() - 1; i >= 0; i--) {
-                ParagraphInfo info = paragraphs.get(i);
-                Log.d("ListDebug", "Форматируем абзац " + (i + 1) + ": [" + info.start + "-" + info.end + "] '" + info.text + "'");
-                formatParagraphAsNumberedList(editable, info.start, info.end, i + 1);
-            }
+            // Если нет выделения, обрабатываем текущий абзац
+            start = TextFormattingHelper.findParagraphStart(editable, start);
+            end = TextFormattingHelper.findParagraphEnd(editable, start);
         }
-
-        // После форматирования обновляем TextBlock
+        TextFormattingHelper.applyNumberedList(editable, start, end);
         updateTextBlockFromEditText();
         markContentChanged();
     }
 
-    private static class ParagraphInfo {
-        int start;
-        int end;
-        String text;
-
-        ParagraphInfo(int start, int end, String text) {
-            this.start = start;
-            this.end = end;
-            this.text = text;
-        }
-    }
-
     private void applyBulletedList() {
         if (focusedEditText == null) return;
-
         Editable editable = focusedEditText.getText();
         int start = focusedEditText.getSelectionStart();
         int end = focusedEditText.getSelectionEnd();
-
-        Log.d("ListDebug", "=== ПРИМЕНЕНИЕ МАРКИРОВАННОГО СПИСКА ===");
-        Log.d("ListDebug", "Выделение: start=" + start + ", end=" + end);
-
         if (start == end) {
-            int paragraphStart = findParagraphStart(editable, start);
-            int paragraphEnd = findParagraphEnd(editable, start);
-            formatParagraphAsBulletedList(editable, paragraphStart, paragraphEnd);
-            focusedEditText.setSelection(paragraphEnd);
-        } else {
-            // СОБИРАЕМ ВСЕ АБЗАЦЫ СНАЧАЛА
-            List<ParagraphInfo> paragraphs = new ArrayList<>();
-            int currentPos = start;
-
-            while (currentPos < end) {
-                int paragraphStart = findParagraphStart(editable, currentPos);
-                int paragraphEnd = findParagraphEnd(editable, currentPos);
-
-                if (paragraphStart < start) paragraphStart = start;
-                if (paragraphEnd > end) paragraphEnd = end;
-
-                String paragraphText = editable.subSequence(paragraphStart, paragraphEnd).toString();
-
-                if (!paragraphText.trim().isEmpty()) {
-                    paragraphs.add(new ParagraphInfo(paragraphStart, paragraphEnd, paragraphText));
-                }
-
-                currentPos = paragraphEnd + 1;
-                if (currentPos >= editable.length() || currentPos >= end) break;
-            }
-
-            Log.d("ListDebug", "Всего собрано абзацев для маркированного списка: " + paragraphs.size());
-
-            // ФОРМАТИРУЕМ С КОНЦА
-            for (int i = paragraphs.size() - 1; i >= 0; i--) {
-                ParagraphInfo info = paragraphs.get(i);
-                formatParagraphAsBulletedList(editable, info.start, info.end);
-            }
+            start = TextFormattingHelper.findParagraphStart(editable, start);
+            end = TextFormattingHelper.findParagraphEnd(editable, start);
         }
+        TextFormattingHelper.applyBulletedList(editable, start, end);
 
         updateTextBlockFromEditText();
         markContentChanged();
@@ -2184,220 +1975,16 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
 
     private void removeListFormatting() {
         if (focusedEditText == null) return;
-
         Editable editable = focusedEditText.getText();
         int start = focusedEditText.getSelectionStart();
         int end = focusedEditText.getSelectionEnd();
-
-        Log.d("ListDebug", "=== УДАЛЕНИЕ ФОРМАТИРОВАНИЯ СПИСКА ===");
-        Log.d("ListDebug", "Выделение: start=" + start + ", end=" + end);
-
         if (start == end) {
-            int paragraphStart = findParagraphStart(editable, start);
-            int paragraphEnd = findParagraphEnd(editable, start);
-            removeListFormattingFromParagraph(editable, paragraphStart, paragraphEnd);
-            focusedEditText.setSelection(paragraphEnd);
-        } else {
-            // СОБИРАЕМ ВСЕ АБЗАЦЫ СНАЧАЛА
-            List<ParagraphInfo> paragraphs = new ArrayList<>();
-            int currentPos = start;
-
-            while (currentPos < end) {
-                int paragraphStart = findParagraphStart(editable, currentPos);
-                int paragraphEnd = findParagraphEnd(editable, currentPos);
-
-                if (paragraphStart < start) paragraphStart = start;
-                if (paragraphEnd > end) paragraphEnd = end;
-
-                String paragraphText = editable.subSequence(paragraphStart, paragraphEnd).toString();
-
-                if (!paragraphText.trim().isEmpty()) {
-                    paragraphs.add(new ParagraphInfo(paragraphStart, paragraphEnd, paragraphText));
-                }
-
-                currentPos = paragraphEnd + 1;
-                if (currentPos >= editable.length() || currentPos >= end) break;
-            }
-
-            Log.d("ListDebug", "Всего собрано абзацев для удаления форматирования: " + paragraphs.size());
-
-            // УДАЛЯЕМ ФОРМАТИРОВАНИЕ С КОНЦА
-            for (int i = paragraphs.size() - 1; i >= 0; i--) {
-                ParagraphInfo info = paragraphs.get(i);
-                removeListFormattingFromParagraph(editable, info.start, info.end);
-            }
+            start = TextFormattingHelper.findParagraphStart(editable, start);
+            end = TextFormattingHelper.findParagraphEnd(editable, start);
         }
-
+        TextFormattingHelper.removeListFormatting(editable, start, end);
         updateTextBlockFromEditText();
         markContentChanged();
-    }
-
-    private int findParagraphStart(CharSequence text, int position) {
-        if (position >= text.length()) {
-            position = text.length() - 1;
-        }
-        if (position < 0) return 0;
-
-        // Ищем предыдущий символ новой строки
-        int i = position;
-        while (i >= 0) {
-            if (i == 0) return 0;
-            if (text.charAt(i) == '\n') {
-                return i + 1; // Начало после \n
-            }
-            i--;
-        }
-        return 0;
-    }
-
-    private int findParagraphEnd(CharSequence text, int position) {
-        if (position >= text.length()) {
-            return text.length();
-        }
-
-        // Ищем следующий символ новой строки
-        int i = position;
-        while (i < text.length()) {
-            if (text.charAt(i) == '\n') {
-                return i; // Конец на \n
-            }
-            i++;
-        }
-        return text.length();
-    }
-
-    // Форматировать абзац как нумерованный список
-    private void formatParagraphAsNumberedList(Editable editable, int start, int end, int number) {
-        String text = editable.subSequence(start, end).toString();
-        Log.d("ListDebug", "Форматируем абзац [" + start + "-" + end + "]: '" + text + "', номер: " + number);
-
-        // Сохраняем отступы в начале строки
-        String indent = "";
-        java.util.regex.Pattern indentPattern = java.util.regex.Pattern.compile("^(\\s*).*");
-        java.util.regex.Matcher matcher = indentPattern.matcher(text);
-        if (matcher.matches()) {
-            indent = matcher.group(1);
-        }
-
-        // Удаляем существующие префиксы списков
-        String cleanText = text.replaceFirst("^\\s*\\d+\\.\\s*", ""); // Удалить "1. ", "2. " и т.д.
-        cleanText = cleanText.replaceFirst("^\\s*[•\\-]\\s*", ""); // Удалить "• " или "- "
-
-        // Если текст не изменился, значит в нем не было префикса
-        if (cleanText.equals(text)) {
-            cleanText = text.replaceFirst("^\\s*", ""); // Удаляем все пробелы в начале
-        }
-
-        // Добавляем новый префикс с номером и сохраняем отступ
-        String newText = indent + number + ". " + cleanText;
-        Log.d("ListDebug", "Новый текст с отступом: '" + newText + "'");
-
-        // Сохраняем существующее форматирование
-        AbsoluteSizeSpan[] sizeSpans = editable.getSpans(start, end, AbsoluteSizeSpan.class);
-        List<AbsoluteSizeSpan> spansList = new ArrayList<>(Arrays.asList(sizeSpans));
-
-        // Заменяем текст
-        editable.replace(start, end, newText);
-
-        // Восстанавливаем форматирование (с учетом смещения)
-        int newEnd = start + newText.length();
-        for (AbsoluteSizeSpan span : spansList) {
-            int spanStart = editable.getSpanStart(span);
-            int spanEnd = editable.getSpanEnd(span);
-
-            // Если спан был в пределах заменяемого текста
-            if (spanStart >= start && spanEnd <= end) {
-                // Удаляем старый спан
-                editable.removeSpan(span);
-
-                // Вычисляем смещение
-                int offset = newText.length() - (end - start);
-
-                // Применяем спан к новому тексту
-                AbsoluteSizeSpan newSpan = new AbsoluteSizeSpan(span.getSize(), true);
-                editable.setSpan(newSpan, spanStart, spanEnd + offset, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-        }
-    }
-
-    // Форматировать абзац как маркированный список
-    private void formatParagraphAsBulletedList(Editable editable, int start, int end) {
-        String text = editable.subSequence(start, end).toString();
-        Log.d("ListDebug", "Форматируем абзац [" + start + "-" + end + "]: '" + text + "'");
-
-        // Удаляем существующие префиксы списков
-        String cleanText = text.replaceFirst("^\\s*\\d+\\.\\s*", "");
-        cleanText = cleanText.replaceFirst("^\\s*[•\\-]\\s*", "");
-
-        if (cleanText.equals(text)) {
-            cleanText = text;
-        }
-
-        // Добавляем новый префикс с маркером
-        String newText = "• " + cleanText;
-        Log.d("ListDebug", "Новый текст: '" + newText + "'");
-
-        // Сохраняем существующее форматирование
-        AbsoluteSizeSpan[] sizeSpans = editable.getSpans(start, end, AbsoluteSizeSpan.class);
-        List<AbsoluteSizeSpan> spansList = new ArrayList<>(Arrays.asList(sizeSpans));
-
-        editable.replace(start, end, newText);
-
-        // Восстанавливаем форматирование
-        int newEnd = start + newText.length();
-        for (AbsoluteSizeSpan span : spansList) {
-            int spanStart = editable.getSpanStart(span);
-            int spanEnd = editable.getSpanEnd(span);
-
-            if (spanStart >= start && spanEnd <= end) {
-                editable.removeSpan(span);
-
-                int offset = newText.length() - (end - start);
-
-                AbsoluteSizeSpan newSpan = new AbsoluteSizeSpan(span.getSize(), true);
-                editable.setSpan(newSpan, spanStart, spanEnd + offset, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-        }
-    }
-
-    // Удалить форматирование списка из абзаца
-    private void removeListFormattingFromParagraph(Editable editable, int start, int end) {
-        String text = editable.subSequence(start, end).toString();
-        Log.d("ListDebug", "Удаляем форматирование абзаца [" + start + "-" + end + "]: '" + text + "'");
-
-        // Удаляем префиксы списков
-        String newText = text.replaceFirst("^\\s*\\d+\\.\\s*", "");
-        newText = newText.replaceFirst("^\\s*[•\\-]\\s*", "");
-
-        // Если текст не изменился, ничего не делаем
-        if (newText.equals(text)) {
-            Log.d("ListDebug", "Текст не содержит форматирования списка");
-            return;
-        }
-
-        Log.d("ListDebug", "Новый текст без форматирования: '" + newText + "'");
-
-        // Сохраняем форматирование
-        AbsoluteSizeSpan[] sizeSpans = editable.getSpans(start, end, AbsoluteSizeSpan.class);
-        List<AbsoluteSizeSpan> spansList = new ArrayList<>(Arrays.asList(sizeSpans));
-
-        editable.replace(start, end, newText);
-
-        // Восстанавливаем форматирование
-        int newEnd = start + newText.length();
-        for (AbsoluteSizeSpan span : spansList) {
-            int spanStart = editable.getSpanStart(span);
-            int spanEnd = editable.getSpanEnd(span);
-
-            if (spanStart >= start && spanEnd <= end) {
-                editable.removeSpan(span);
-
-                int offset = newText.length() - (end - start);
-
-                AbsoluteSizeSpan newSpan = new AbsoluteSizeSpan(span.getSize(), true);
-                editable.setSpan(newSpan, spanStart, spanEnd + offset, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-        }
     }
 
     // Метод для обновления TextBlock из EditText
@@ -2406,29 +1993,16 @@ public class TextEditorActivity extends AppCompatActivity implements DocxAdapter
             ContentBlock block = blockManager.getBlockById(focusedBlockId);
             if (block instanceof TextBlock) {
                 TextBlock textBlock = (TextBlock) block;
-                String currentText = focusedEditText.getText().toString();
-                Log.d("ListDebug", "updateTextBlockFromEditText: текст из EditText: '" + currentText + "'");
-                Log.d("ListDebug", "Количество переносов: " + countNewlines(currentText));
 
-                textBlock.updateHtmlFromSpannable((Spannable) focusedEditText.getText());
-                Log.d("ListDebug", "HTML после обновления: " + textBlock.getHtmlContent());
+                textBlock.updateFromSpannable(focusedEditText.getText());
+
                 markContentChanged();
             }
         }
     }
 
-    private int countNewlines(String text) {
-        if (text == null) return 0;
-        int count = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '\n') count++;
-        }
-        return count;
-    }
 
-    /**
-     * Проверяет, является ли документ пустым (не содержит содержания и не имеет названия)
-     */
+    // Проверяет, является ли документ пустым (не содержит содержания и не имеет названия)
     private boolean isEmptyDocument() {
         Log.d("EmptyCheck", "=== ПРОВЕРКА ПУСТОГО ДОКУМЕНТА ===");
 
